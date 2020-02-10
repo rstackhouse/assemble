@@ -1,0 +1,93 @@
+	<div id="eventData"></div>
+
+	<div id="scouts"></div>
+
+	<div id="siblings"></div>
+
+	<div id="adults"></div>
+
+	<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addParticipant" data-which="scout">
+		Add Scout
+	</button>
+
+	<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addParticipant" data-which="sibling">
+		Add Sibling 
+	</button>
+
+	<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addParticipant" data-which="adult">
+		Add Adult
+	</button>
+
+
+	<div class="modal fade" id="addParticipant" tabindex="-1" role="dialog" aria-labelledby="participantModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="participantModalLabel">Modal title</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+      				</div>
+      				<div class="modal-body">
+					<div>
+						<form id="participantForm">
+							<div class="form-group">
+								<label for="firstName">First Name</label>
+								<input type="text" class="form-control" id="firstName">
+								<label for="lastName">Last Name</label>
+								<input type="text" class="form-control" id="lastName">
+								<label for="email">Email</label>
+								<input type="email" class="form-control" id="email">
+								<label for="age">Age</label>
+								<input type="number" class="form-control" id="age">
+								<label for="den">Den</label>
+								<input type="text" class="form-control" id="den">
+								<label for="allergies">Allergies</label>
+								<textarea class="form-control" id="allergies">
+								</textarea>
+								<label for="dietaryRestrictions">Dietary Restrictions</label>
+								<textarea class="form-control" id="dietaryRestrictions">
+								</textarea>
+								<button type="button" class="btn btn-primary" id="add"> 
+									Submit	
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script type="text/plain" id="eventTemplate">
+		<h2>{{name}}</h2>
+		{{description}}
+	</script>
+
+	<script type="text/plain" id="participantTemplate">
+			<h3>{{participantType}}</h3>
+			{{#participants}}
+			<dl>
+				<dt>First Name</dt>
+				<dd>{{firstName}}</dd>
+				<dt>Last Name</dt>
+				<dd>{{lastName}}</dd>
+				{{#isAdult}}
+					<dt>Email</dt>
+					<dd>{{email}}</dd>
+				{{/isAdult}}
+				{{^isAdult}}
+					<dt>Age</dt>
+					<dd>{{age}}</dd>
+				{{/isAdult}}
+				{{#isScout}}
+					<dt>Den</dt>
+					<dd>{{den}}</dd>
+				{{/isScout}}
+				<dt>Allergies</dt>
+				<dd>{{allergies}}</dd>
+				<dt>DietaryRestrictions</dt>
+				<dd>{{dietaryRestrictions}}</dd>
+			</dl>
+			{{/participants}}
+	</script>
