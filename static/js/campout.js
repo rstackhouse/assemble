@@ -1,18 +1,8 @@
 (function () {
-
-	/*
-		TODO:
-		4. Render event data
-		5. Add Registration class that has FK to event that is keyed by guid
-		6. Look for registration guid in local storage, if none found, call to create registration
-		6. Add FK on participant table to registration
-		7. Add form to post to paypal
-	*/
-
 	var script = document.currentScript;
 	var scriptPath = script.src;
-	var basePath = null;
-	var eventId = null;
+	var basePath = scriptPath.substr(0,script.src.indexOf('/view'));
+	var eventId = script.getAttribute('data-event-id');
 	var documentLoaded = false;
 	var viewSrc = null;
 	var viewLoading = false;
@@ -22,10 +12,19 @@
 	var siblings = [];
 	var $ = null;
 	var template = null;
+	var eventTemplate = null;
+	var checkoutTemplate = null;
 	var event = null;
 	var eventPrices = null;
 	var fetchingParticipants = false;
 	var registrationId = localStorage.getItem('registrationId');
+	var scoutPrice = null;
+	var siblingPrice = null;
+	var adultPrice = null;
+	var businessId = null;
+	var notifyUrl = null;
+	var iconUrl = null;
+	var returnUrl = null;
 
 	function addBootstrap(callback) {
 		var head = document.getElementsByTagName('head')[0];
@@ -121,7 +120,50 @@
 	}
 
 	function getParticipants() {
-		
+		fetchingParticipants = true;
+		var xhr = new XMLHttpRequest();
+		xhr.onload = function(e) {
+			fetchingParticipants = false;
+			participants = JSON.parse(xhr.response);
+
+			for (var i = 0; i < participants.length; i++) {
+				var p = participants[i];
+				if (p.participant_type == 'scout') {
+					scouts.push({
+						firstName: p.first_name,
+						lastName: p.last_name,
+						age: p.age,
+						den: p.den,
+						allergies: p.allergies,
+						dietaryRestrictions: p.dietary_restrictions
+					});
+				}
+				else if (p.participant_type == 'sibling') {
+					siblings.push({
+						firstName: p.first_name,
+						lastName: p.last_name,
+						age: p.age,
+						allergies: p.allergies,
+						dietaryRestrictions: p.dietary_restrictions
+					});
+				}
+				else if (p.participant_type == 'adult') {
+					adults.push({
+						firstName: p.first_name,
+						lastName: p.last_name,
+						email: p.email,
+						allergies: p.allergies,
+						dietaryRestrictions: p.dietary_restrictions
+					});
+				}
+			}
+
+			populateData();
+			fillCart();
+		};
+		var url = basePath + '/events/' + eventId + '/participants';
+		xhr.open('GET',url);
+		xhr.send();
 	}
 
 	function getEvent() {
@@ -138,7 +180,26 @@
 	function getEventPrices() {
 		var xhr = new XMLHttpRequest();
 		xhr.onload = function(e) {
-			eventPrices = JSON.parse(xhr.response);
+			prices = JSON.parse(xhr.response);
+			eventPrices = [];
+			for (var i = 0; i < prices.length; i++) {
+				var p = prices[i];
+				var price = {
+					price: p.price,
+					participantType: p.participant_type
+				};
+				eventPrices.push(price);
+				if (price.participantType == 'scout') {
+					scoutPrice = price.price;
+				}
+				else if (price.participantType == 'sibling') {
+					siblingPrice = price.price;
+				}
+				else if (price.participantType == 'adult') {
+					adultPrice = price.price;
+				}
+			}
+
 			populateData();
 		};
 		var url = basePath + '/events/' + eventId + '/prices';
@@ -147,8 +208,6 @@
 	}
 
 	function getData() {
-		eventId = script.getAttribute('data-event-id');
-		basePath = script.src.substr(0,script.src.indexOf('/view'));
 		getEvent();
 		getEventPrices();
 	}
@@ -156,7 +215,7 @@
 	getData();
 
 	function canPopulateData() {
-		return registrationId != null && viewSrc != null && event != null && eventPrices != null;
+		return registrationId != null && !fetchingParticipants && viewSrc != null && event != null && eventPrices != null;
 	}
 
 	function populateData() {
@@ -201,6 +260,7 @@
 		};
 		scouts.push(scout);
 		saveParticipant(scout);
+		fillCart();
 	}
 	
 	function addAdult() {
@@ -216,6 +276,7 @@
 		};
 		adults.push(adult);
 		saveParticipant(adult);
+		fillCart();
 	}
 
 	function addSibling() {
@@ -231,6 +292,52 @@
 		};
 		siblings.push(sibling);
 		saveParticipant(sibling);
+		fillCart();
+	}
+
+	function fillCart() {
+		var itemNumber = 0;
+		var items = [];
+		if (scouts.length > 0) {
+			items.push({ 
+				name:'Scout ' + event.name + ' registration',
+				amount: calculateUnitPrice(scoutPrice),
+				quantity: scouts.length,
+				itemNumber: ++i
+			})
+		}
+		if (siblings.length > 0) {
+			items.push({ 
+				name:'Sibling ' + event.name + ' registration',
+				amount: calculateUnitPrice(siblingPrice),
+				quantity: siblings.length,
+				itemNumber: ++i
+			})
+		}
+		if (adults.length > 0) {
+			items.push({ 
+				name:'Adult ' + event.name + ' registration',
+				amount: calculateUnitPrice(adultPrice),
+				quantity: adults.length,
+				itemNumber: ++i
+			})
+		}
+		if (scouts.length > 0 || siblings.length > 0 || adults.length > 0) {
+			items.push({ 
+				name:'Processing fee',
+				amount: 0.30,
+				quantity: 1,
+				itemNumber: ++i
+			});
+		}
+		$('#checkout').html(Mustache.render(checkoutTemplate, { 
+			items: items,
+			businessId: businessId,
+			notifyUrl: notifyUrl,
+			iconUrl: iconUrl,
+			returnUrl: returnUrl,
+			custom: registrationId
+		}));
 	}
 
 	function findScout(firstName) {
@@ -273,7 +380,7 @@
 		var participant = {
 			first_name: p.firstName,
 			last_name: p.lastName,
-			email: p.email,
+			email: p.email || null,
 			age: p.age || null,
 			age: p.den || null,
 			participant_type: p.isAdult ? 'adult' : p.isScout ? 'scout' : 'sibling',
@@ -283,7 +390,6 @@
 			registration_id: registrationId
 		};
 		var xhr = new XMLHttpRequest();
-		xhr.setRequestHeader("Content-Type", "application/json");
 		xhr.onload = function(e) {
 			resp = JSON.parse(xhr.response);
 			if (window.console) {
@@ -304,6 +410,7 @@
 		};
 		var url = basePath + '/events/' + eventId + '/participants';
 		xhr.open('POST',url);
+		xhr.setRequestHeader("Content-Type", "application/json");
 		xhr.send(JSON.stringify(participant));
 	}
 
@@ -337,6 +444,7 @@
 	}
 
 	function render() {
+		$('#event').html(Mustache.render(eventTemplate, event));
 		$('#scouts').html(Mustache.render(template, { participantType: 'Scouts', participants: scouts }));
 		$('#siblings').html(Mustache.render(template, { participantType: 'Siblings', participants: siblings }));
 		$('#adults').html(Mustache.render(template, { participantType: 'Adults', participants: adults }));
@@ -400,7 +508,31 @@
 
 	function parseTemplate() {
 		template = strip($('#participantTemplate')[0].innerHTML);
+		eventTemplate = strip($('#eventTemplate')[0].innerHTML);
+		checkoutTemplate = strip($('#paymentFormTemplate')[0].innerHTML);
 		Mustache.parse(template);
+		Mustache.parse(eventTemplate);
+		Mustache.parse(checkoutTemplate);
+	}
+
+	function calculateUnitPrice(price) {
+		// PayPal rate is 0.029% + $0.30
+		// x = subTotal + .029x
+		// .971x = subTotal
+		// x = subTotal / .971
+		return price / .971;
+	}
+
+	function calculateSubtotal(items, price) {
+		// PayPal rate is 0.029% + $0.30
+		// x = subTotal + .029x
+		// .971x = subTotal
+		// x = subTotal / .971
+		return items.length * price / .971;
+	}
+
+	function calculateTotal() {
+		return calculateSubtotal(scouts, scoutPrice) + calculateSubtotal(siblings, siblingPrice) + calculateTotal(adults, adultPrice) + 0.30;
 	}
 
 	document.onreadystatechange = function (e) {

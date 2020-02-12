@@ -1,18 +1,18 @@
-	<div id="eventData"></div>
+	<div id="event"></div>
 
 	<div id="scouts"></div>
-
-	<div id="siblings"></div>
-
-	<div id="adults"></div>
 
 	<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addParticipant" data-which="scout">
 		Add Scout
 	</button>
 
+	<div id="siblings"></div>
+
 	<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addParticipant" data-which="sibling">
 		Add Sibling 
 	</button>
+
+	<div id="adults"></div>
 
 	<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addParticipant" data-which="adult">
 		Add Adult
@@ -59,6 +59,8 @@
 		</div>
 	</div>
 
+	<div id="checkout"></div>
+
 	<script type="text/plain" id="eventTemplate">
 		<h2>{{name}}</h2>
 		{{description}}
@@ -90,4 +92,27 @@
 				<dd>{{dietaryRestrictions}}</dd>
 			</dl>
 			{{/participants}}
+	</script>
+
+	<!-- https://developer.paypal.com/docs/paypal-payments-standard/integration-guide/formbasics/ -->
+
+	<script type="text/plain" id="paymentFormTemplate">
+		<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+			<input type="hidden" name="cmd" value="_cart">
+			<input type="hidden" name="charset" value="utf-8">
+			<input type="hidden" name="currency_code" value="USD">
+			<input type="hidden" name="business" value="{{businessId}}"
+			<input type="hidden" name="notify_url" value="{{notifyUrl}}">
+			<input type="hidden" name="upload" value="1">
+			<!-- 150 x 150 logo -->
+			<input type="hidden" name="image_url" value="{{iconUrl}}">
+			<input type="hidden" name="no_shipping" value="1">
+			<input type="hidden" name="return" value="{{returnUrl}}"
+			{{#items}}
+				<input type="hidden" name="item_name_{{itemNumber}}" value="{{name}}">
+				<input type="hidden" name="amount_{{itemNumber}}" value="{{amount}}">
+				<input type="hidden" name="quantity_{{itemNumber}}" value="{{quantity}}">
+			{{/items}}
+			<input type="hidden" name="custom" value="{{custom}}">
+		</form>
 	</script>

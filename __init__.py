@@ -9,12 +9,13 @@ import traceback
 import io
 import json
 import uuid
-# import logging
+import logging
+
 app = Flask(__name__, static_folder='static', static_url_path='')
 
 db = SQLAlchemy(app)
 
-# logging.basicConfig(filename='assemble.log', level=logging.DEBUG)
+logging.basicConfig(filename='assemble.log', level=logging.DEBUG)
 
 app.config.from_envvar('ASSEMBLE_SETTINGS_FILE')
 
@@ -144,9 +145,9 @@ def post_event_participants(event_id):
 		participant = Participant()
 		participant.first_name = json['first_name']
 		participant.last_name = json['last_name']
-		participant.email = json['email']
-		participant.age = json['age']
-		participant.den = json['den']
+		participant.email = json.get('email', None)
+		participant.age = json.get('age', None)
+		participant.den = json.get('den', None)
 		participant.participant_type = json['participant_type']
 		participant.allergies = json['allergies']
 		participant.dietary_restrictions = json['dietary_restrictions']
@@ -161,11 +162,21 @@ def post_event_participants(event_id):
 		if exc_value is None:
 			return "Unexpected error: {err}\nTraceback: {tb}".format(err=exc_type,tb=f.getvalue()), 500
 		return "Unexpected error: {err}\nMessage: {msg}\nTraceback: {tb}".format(err=exc_type,msg=exc_value,tb=f.getvalue()), 500
-	return '', 201
+	return jsonify(
+			first_name=participant.first_name, 
+			last_name=participant.last_name, 
+			email=participant.email, 
+			age=participant.age, 
+			den=participant.den, 
+			participant_type=participant.participant_type,
+			allergies=participant.allergies,
+			dietary_restrictions=participant.dietary_restrictions,
+			event_id=participant.event_id,
+			registration_id=participant.registration_id), 201
 
 @app.route('/events/<int:event_id>/participants')
 def get_event_participants(event_id):
-	prices = None
+	participants = None
 	try:
 		participants = Participant.query.filter(Participant.event_id == event_id).all()
 	except:
@@ -175,7 +186,7 @@ def get_event_participants(event_id):
 		if exc_value is None:
 			return "Unexpected error: {err}\nTraceback: {tb}".format(err=exc_type,tb=f.getvalue()), 500
 		return "Unexpected error: {err}\nMessage: {msg}\nTraceback: {tb}".format(err=exc_type,msg=exc_value,tb=f.getvalue()), 500
-	if prices is None:
+	if participants is None:
 		return '', 204
 
 	retval = [ {'first_name':participant.first_name, 
@@ -207,4 +218,31 @@ def create_registration(event_id):
 			return "Unexpected error: {err}\nTraceback: {tb}".format(err=exc_type,tb=f.getvalue()), 500
 		return "Unexpected error: {err}\nMessage: {msg}\nTraceback: {tb}".format(err=exc_type,msg=exc_value,tb=f.getvalue()), 500
 	return jsonify(id=registration.id, event_id=registration.event_id), 201
+
+@app.route('/events/<int:event_id>/registrations')
+def get_event_registrations(event_id):
+	prices = None
+	try:
+		registrations = Registration.query.filter(Registration.event_id == event_id).all()
+	except:
+		exc_type, exc_value, exc_traceback = sys.exc_info()
+		f = io.StringIO()
+		traceback.print_tb(exc_traceback, file=f)
+		if exc_value is None:
+			return "Unexpected error: {err}\nTraceback: {tb}".format(err=exc_type,tb=f.getvalue()), 500
+		return "Unexpected error: {err}\nMessage: {msg}\nTraceback: {tb}".format(err=exc_type,msg=exc_value,tb=f.getvalue()), 500
+	if prices is None:
+		return '', 204
+
+	retval = [ {'id':registration.id, 'event_id':registration.event_id} for registration in registrations ]
+
+	return json.dumps(retval), 200, {'Content-Type': 'application/json'}
+
+# IPN example https://github.com/paypal/ipn-code-samples/blob/master/python/paypal_ipn.py
+
+@app.route('/events/<int:event_id/registrations/<str:registration_id>/ipn', methods=['POST'])
+def handle_ipn(event_id, registration_id):
+	app.logger.info('Request: %s', request.form)
+
+	return '', 200
 
