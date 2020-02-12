@@ -53,6 +53,8 @@ class Participant(db.Model):
 	event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
 	registration_id = db.Column(db.Integer, db.ForeignKey('registration.id'), nullable=False)
 
+# TODO: Settings class with paypal settings for prod and testing
+
 @app.route('/')
 def hello_world():
     return render_template('hello.html',uri=app.config['BASE_URI'],date=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),config=os.environ.get('ASSEMBLE_SETTINGS_FILE','duck'),inst=os.environ.get('ASSEMBLE_INSTANCE_PATH','goose'))
@@ -235,6 +237,33 @@ def get_event_registrations(event_id):
 		return '', 204
 
 	retval = [ {'id':registration.id, 'event_id':registration.event_id} for registration in registrations ]
+
+	return json.dumps(retval), 200, {'Content-Type': 'application/json'}
+
+@app.route('/events/<int:event_id>/registrations/<string:registration_id>/participants')
+def get_event_registration_participants(event_id, registration_id):
+	participants = None
+	try:
+		participants = Participant.query.filter(Participant.event_id == event_id and Participant.registration_id == registration_id).all()
+	except:
+		exc_type, exc_value, exc_traceback = sys.exc_info()
+		f = io.StringIO()
+		traceback.print_tb(exc_traceback, file=f)
+		if exc_value is None:
+			return "Unexpected error: {err}\nTraceback: {tb}".format(err=exc_type,tb=f.getvalue()), 500
+		return "Unexpected error: {err}\nMessage: {msg}\nTraceback: {tb}".format(err=exc_type,msg=exc_value,tb=f.getvalue()), 500
+	if participants is None:
+		return '', 204
+
+	retval = [ {'first_name':participant.first_name, 
+				'last_name':participant.last_name,
+				'email':participant.email,
+				'age':participant.age,
+				'den':participant.den,
+				'participant_type':participant.participant_type,
+				'allergies':participant.allergies,
+				'dietary_restrictions':participant.dietary_restrictions, 
+				'event_id':participant.event_id} for participant in participants ]
 
 	return json.dumps(retval), 200, {'Content-Type': 'application/json'}
 

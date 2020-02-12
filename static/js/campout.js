@@ -161,7 +161,7 @@
 			populateData();
 			fillCart();
 		};
-		var url = basePath + '/events/' + eventId + '/participants';
+		var url = basePath + '/events/' + eventId + '/registrations/' + registrationId + '/participants';
 		xhr.open('GET',url);
 		xhr.send();
 	}
