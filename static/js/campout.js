@@ -22,9 +22,12 @@
 	var siblingPrice = null;
 	var adultPrice = null;
 	var businessId = null;
+	var submissionUrl = null;
 	var notifyUrl = null;
 	var iconUrl = null;
-	var returnUrl = null;
+	var returnUrl = location.href;
+	var settings = null;
+	var test = script.hasAttribute('data-test') ? Boolean(script.getAttribute('data-test')) : false;
 
 	function addBootstrap(callback) {
 		var head = document.getElementsByTagName('head')[0];
@@ -110,11 +113,13 @@
 	}
 
 	function getData() {
+		getSettings();
 		getEvent();
 		getEventPrices();
 	}
 
 	if (registrationId) {
+		notifyUrl = basePath + '/events/' + eventId + '/registrations/' + registrationId + '/ipn';
 		if (window.console) {
 			console.log('Resuming with registration: ' + registrationId);
 		}
@@ -172,6 +177,24 @@
 		xhr.send();
 	}
 
+	function getSettings() {
+		var xhr = new XMLHttpRequest();
+		xhr.onload = function(e) {
+			s = JSON.parse(xhr.response);
+			// TODO: Icon url?
+			settings = {
+				businessId: s.business_id,
+				submissionUrl: s.submissionUrl
+			};
+			businessId = settings.businessId;
+			submissionUrl = settings.submissionUrl;
+			populateData();
+		};
+		var url = basePath + '/settings'
+		xhr.open('GET',url);
+		xhr.send();
+	}
+
 	function getEvent() {
 		var xhr = new XMLHttpRequest();
 		xhr.onload = function(e) {
@@ -214,7 +237,7 @@
 	}
 
 	function canPopulateData() {
-		return registrationId != null && !fetchingParticipants && viewSrc != null && event != null && eventPrices != null;
+		return registrationId != null && settings != null && !fetchingParticipants && viewSrc != null && event != null && eventPrices != null;
 	}
 
 	function populateData() {
@@ -333,6 +356,7 @@
 		$('#checkout').html(Mustache.render(checkoutTemplate, { 
 			items: items,
 			businessId: businessId,
+			submissionUrl: submissionUrl,
 			notifyUrl: notifyUrl,
 			iconUrl: iconUrl,
 			returnUrl: returnUrl,

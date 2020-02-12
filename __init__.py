@@ -53,7 +53,14 @@ class Participant(db.Model):
 	event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
 	registration_id = db.Column(db.Integer, db.ForeignKey('registration.id'), nullable=False)
 
-# TODO: Settings class with paypal settings for prod and testing
+class Settings(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	business_id = db.Column(db.String(100), nullable=False)
+	test_business_id = db.Column(db.String(100), nullable=False)
+	submission_url = db.Column(db.String(100), nullable=False)
+	test_submission_url = db.Column(db.String(100), nullable=False)
+	verification_url= db.Column(db.String(100), nullable=False)
+	test_verification_url= db.Column(db.String(100), nullable=False)
 
 @app.route('/')
 def hello_world():
@@ -271,7 +278,28 @@ def get_event_registration_participants(event_id, registration_id):
 
 @app.route('/events/<int:event_id>/registrations/<string:registration_id>/ipn', methods=['POST'])
 def handle_ipn(event_id, registration_id):
-	app.logger.info('Request: %s', request.form)
+	for key in request.form.keys():
+		app.logger.info('%s: %s', key, str(request.form.get(key)))
 
 	return '', 200
 
+@app.route('/settings')
+def get_settings():
+	settings = None
+	test = request.args.get('test', False)
+	try:
+		settings = Settings.query.get(1)
+	except:
+		exc_type, exc_value, exc_traceback = sys.exc_info()
+		f = io.StringIO()
+		traceback.print_tb(exc_traceback, file=f)
+		if exc_value is None:
+			return "Unexpected error: {err}\nTraceback: {tb}".format(err=exc_type,tb=f.getvalue()), 500
+		return "Unexpected error: {err}\nMessage: {msg}\nTraceback: {tb}".format(err=exc_type,msg=exc_value,tb=f.getvalue()), 500
+	if settings is None:
+		return '', 204
+
+	if test:
+		return jsonify(id=settings.id, business_id=settings.test_business_id, submission_url=settings.test_submission_url, verification_url=settings.test_verification_url), 200
+	else:
+		return jsonify(id=settings.id, business_id=settings.business_id, submission_url=settings.submission_url, verification_url=settings.verification_url), 200
