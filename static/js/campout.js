@@ -109,13 +109,20 @@
 		xhr.send();
 	}
 
+	function getData() {
+		getEvent();
+		getEventPrices();
+	}
+
 	if (registrationId) {
 		if (window.console) {
 			console.log('Resuming with registration: ' + registrationId);
 		}
+		getData();
 		getParticipants();
 	}
 	else {
+		getData();
 		createRegistration();
 	}
 
@@ -159,7 +166,6 @@
 			}
 
 			populateData();
-			fillCart();
 		};
 		var url = basePath + '/events/' + eventId + '/registrations/' + registrationId + '/participants';
 		xhr.open('GET',url);
@@ -207,13 +213,6 @@
 		xhr.send();
 	}
 
-	function getData() {
-		getEvent();
-		getEventPrices();
-	}
-
-	getData();
-
 	function canPopulateData() {
 		return registrationId != null && !fetchingParticipants && viewSrc != null && event != null && eventPrices != null;
 	}
@@ -221,6 +220,7 @@
 	function populateData() {
 		if (canPopulateData()) {
 			render();
+			fillCart();
 		}
 	}
 
