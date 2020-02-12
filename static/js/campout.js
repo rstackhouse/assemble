@@ -319,7 +319,7 @@
 	}
 
 	function fillCart() {
-		var itemNumber = 0;
+		var i = 0;
 		var items = [];
 		if (scouts.length > 0) {
 			items.push({ 
