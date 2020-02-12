@@ -240,7 +240,7 @@ def get_event_registrations(event_id):
 
 # IPN example https://github.com/paypal/ipn-code-samples/blob/master/python/paypal_ipn.py
 
-@app.route('/events/<int:event_id/registrations/<str:registration_id>/ipn', methods=['POST'])
+@app.route('/events/<int:event_id>/registrations/<string:registration_id>/ipn', methods=['POST'])
 def handle_ipn(event_id, registration_id):
 	app.logger.info('Request: %s', request.form)
 
