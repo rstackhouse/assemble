@@ -302,10 +302,21 @@ def handle_ipn(event_id, registration_id):
 	
 		request_body = urllib.parse.parse_qsl('cmd=_notify-validate&' + raw)
 
+		response = None
+
 		if test:
-			requests.post(setting.test_verification_url, data=request_body)
+			response = requests.post(setting.test_verification_url, data=request_body)
 		else:
-			requests.post(settings.verification_url)
+			response = requests.post(settings.verification_url, data=request_body)
+
+		if response.text == 'VERIFIED':
+    		registration = Registration.query.filter(Registration.id == registration_id).first()
+    		registration.completed = True
+    		db.session.commit()
+
+		elif response.text == 'INVALID':
+			return '', 400
+
 	except:
 		exc_type, exc_value, exc_traceback = sys.exc_info()
 		f = io.StringIO()
