@@ -14,6 +14,7 @@
 	var template = null;
 	var eventTemplate = null;
 	var checkoutTemplate = null;
+	var summaryTemplate = null;
 	var event = null;
 	var eventPrices = null;
 	var fetchingParticipants = false;
@@ -353,6 +354,11 @@
 				itemNumber: ++i
 			});
 		}
+
+		$('#summary').html(Mustache.render(summaryTemplate, {
+			items: items
+		}));
+
 		$('#checkout').html(Mustache.render(checkoutTemplate, { 
 			items: items,
 			businessId: businessId,
@@ -360,7 +366,7 @@
 			notifyUrl: notifyUrl,
 			iconUrl: iconUrl,
 			returnUrl: returnUrl,
-			custom: registrationId
+			custom: JSON.stringify({ registration_id: registrationId, test: test })
 		}));
 	}
 
@@ -438,28 +444,38 @@
 		xhr.send(JSON.stringify(participant));
 	}
 
+	function handleViewLoaded() {
+		if (viewSrc != null && documentLoaded) {	
+			bindModal();
+			parseTemplate();
+			populateData();
+		}
+	}
+
 	function loadView(e) {
 		$ = jQuery;
-		if (e) {
-			markLoaded(e.target);
+		if ($('#event').length > 0) {
+			/* Pre-loaded view */
+			handleViewLoaded();
 		}
-		if (viewLoading || !canLoadView()) {
-			return;
-		}
-		viewLoading = true;
-		var xhr = new XMLHttpRequest();
-		xhr.onload = function(e) {
-			viewSrc = xhr.response;
-			if (documentLoaded) {
-				script.after(createFragment(viewSrc));				
-				bindModal();
-				parseTemplate();
-				populateData();
+		else {
+			if (e) {
+				markLoaded(e.target);
 			}
-		};
-		var url = scriptPath.replace('.js', '.html').replace('/js','');
-		xhr.open('GET',url);
-		xhr.send();
+			if (viewLoading || !canLoadView()) {
+				return;
+			}
+			viewLoading = true;
+			var xhr = new XMLHttpRequest();
+			xhr.onload = function(e) {
+				viewSrc = xhr.response;
+				script.after(createFragment(viewSrc));
+				handleViewLoaded();
+			};
+			var url = scriptPath.replace('.js', '.html').replace('/js','');
+			xhr.open('GET',url);
+			xhr.send();
+		}
 	}
 
 	function bindModal() {
@@ -527,16 +543,18 @@
 	}
 
 	function strip(str) {
-    		return str.replace(/^\s+|\s+$/g, '');
+    	return str.replace(/^\s+|\s+$/g, '');
 	}
 
 	function parseTemplate() {
 		template = strip($('#participantTemplate')[0].innerHTML);
 		eventTemplate = strip($('#eventTemplate')[0].innerHTML);
 		checkoutTemplate = strip($('#paymentFormTemplate')[0].innerHTML);
+		summaryTemplate = strip($('#summaryTemplate')[0].innerHTML);
 		Mustache.parse(template);
 		Mustache.parse(eventTemplate);
 		Mustache.parse(checkoutTemplate);
+		Mustache.parse(summaryTemplate);
 	}
 
 	function calculateUnitPrice(price) {
@@ -562,11 +580,7 @@
 	document.onreadystatechange = function (e) {
 		if (document.readyState == 'interactive') {
 			documentLoaded = true;
-			if (viewSrc != null) {
-				script.after(createFragment(viewSrc));
-				bindModal();
-				parseTemplate();
-			}
+			handleViewLoaded();
 		}
 	};
 	

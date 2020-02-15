@@ -59,6 +59,8 @@
 		</div>
 	</div>
 
+	<div id="summary"></div>
+
 	<div id="checkout"></div>
 
 	<script type="text/plain" id="eventTemplate">
@@ -68,30 +70,48 @@
 
 	<script type="text/plain" id="participantTemplate">
 			<h3>{{participantType}}</h3>
+			<div>
 			{{#participants}}
-			<dl>
-				<dt>First Name</dt>
-				<dd>{{firstName}}</dd>
-				<dt>Last Name</dt>
-				<dd>{{lastName}}</dd>
-				{{#isAdult}}
-					<dt>Email</dt>
-					<dd>{{email}}</dd>
-				{{/isAdult}}
-				{{^isAdult}}
-					<dt>Age</dt>
-					<dd>{{age}}</dd>
-				{{/isAdult}}
-				{{#isScout}}
-					<dt>Den</dt>
-					<dd>{{den}}</dd>
-				{{/isScout}}
-				<dt>Allergies</dt>
-				<dd>{{allergies}}</dd>
-				<dt>DietaryRestrictions</dt>
-				<dd>{{dietaryRestrictions}}</dd>
-			</dl>
+				<dl>
+					<dt>First Name</dt>
+					<dd>{{firstName}}</dd>
+					<dt>Last Name</dt>
+					<dd>{{lastName}}</dd>
+					{{#isAdult}}
+						<dt>Email</dt>
+						<dd>{{email}}</dd>
+					{{/isAdult}}
+					{{^isAdult}}
+						<dt>Age</dt>
+						<dd>{{age}}</dd>
+					{{/isAdult}}
+					{{#isScout}}
+						<dt>Den</dt>
+						<dd>{{den}}</dd>
+					{{/isScout}}
+					<dt>Allergies</dt>
+					<dd>{{allergies}}</dd>
+					<dt>DietaryRestrictions</dt>
+					<dd>{{dietaryRestrictions}}</dd>
+				</dl>
 			{{/participants}}
+			</div>
+	</script>
+
+	<script type="text/plain" id="summaryTemplate">
+		<div>
+			<table>
+				<tbody>
+				{{#items}}
+					<tr>
+						<td>{{name}}</td>
+						<td>{{quantity}}</td>
+						<td>{{amount}}</td>
+					</tr>
+				{{/items}}
+				</tbody>
+			</table>
+		</div>
 	</script>
 
 	<!-- https://developer.paypal.com/docs/paypal-payments-standard/integration-guide/formbasics/ -->

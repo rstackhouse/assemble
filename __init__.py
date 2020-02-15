@@ -10,6 +10,8 @@ import io
 import json
 import uuid
 import logging
+import requests
+import urllib.parse
 
 app = Flask(__name__, static_folder='static', static_url_path='')
 
@@ -39,6 +41,7 @@ class EventPrice(db.Model):
 class Registration(db.Model):
 	id = db.Column(db.String(36), primary_key=True)
 	event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
+	completed = db.Column(db.Boolean)
 
 class Participant(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
@@ -243,7 +246,7 @@ def get_event_registrations(event_id):
 	if prices is None:
 		return '', 204
 
-	retval = [ {'id':registration.id, 'event_id':registration.event_id} for registration in registrations ]
+	retval = [ {'id':registration.id, 'event_id':registration.event_id, 'completed':registration.completed} for registration in registrations ]
 
 	return json.dumps(retval), 200, {'Content-Type': 'application/json'}
 
@@ -278,8 +281,39 @@ def get_event_registration_participants(event_id, registration_id):
 
 @app.route('/events/<int:event_id>/registrations/<string:registration_id>/ipn', methods=['POST'])
 def handle_ipn(event_id, registration_id):
-	for key in request.form.keys():
-		app.logger.info('%s: %s', key, str(request.form.get(key)))
+	settings = None
+	test = False
+	custom = request.args.get('custom', '')
+
+	if len(custom) > 0:
+		dict = json.loads(custom)
+		test = dict.get('test', False)
+
+	try:
+		raw = request.get_data().decode('utf-8')
+		app.logger.info('Data: %s', raw)
+		for key in request.form.keys():
+			app.logger.info('%s: %s', key, str(request.form.get(key)))
+
+		settings = Settings.query.get(1)
+
+		if settings is None:
+			return '', 400
+	
+		request_body = urllib.parse.parse_qsl('cmd=_notify-validate&' + raw)
+
+		if test:
+			requests.post(setting.test_verification_url, data=request_body)
+		else:
+			requests.post(settings.verification_url)
+	except:
+		exc_type, exc_value, exc_traceback = sys.exc_info()
+		f = io.StringIO()
+		traceback.print_tb(exc_traceback, file=f)
+		if exc_value is None:
+			return "Unexpected error: {err}\nTraceback: {tb}".format(err=exc_type,tb=f.getvalue()), 500
+		return "Unexpected error: {err}\nMessage: {msg}\nTraceback: {tb}".format(err=exc_type,msg=exc_value,tb=f.getvalue()), 500
+
 
 	return '', 200
 
@@ -300,6 +334,6 @@ def get_settings():
 		return '', 204
 
 	if test:
-		return jsonify(id=settings.id, business_id=settings.test_business_id, submission_url=settings.test_submission_url, verification_url=settings.test_verification_url), 200
+		return jsonify(id=settings.id, business_id=settings.test_business_id, submission_url=settings.test_submission_url), 200
 	else:
-		return jsonify(id=settings.id, business_id=settings.business_id, submission_url=settings.submission_url, verification_url=settings.verification_url), 200
+		return jsonify(id=settings.id, business_id=settings.business_id, submission_url=settings.submission_url), 200
