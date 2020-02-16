@@ -185,7 +185,7 @@
 			// TODO: Icon url?
 			settings = {
 				businessId: s.business_id,
-				submissionUrl: s.submissionUrl
+				submissionUrl: s.submission_url
 			};
 			businessId = settings.businessId;
 			submissionUrl = settings.submissionUrl;
