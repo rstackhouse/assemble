@@ -191,7 +191,7 @@
 			submissionUrl = settings.submissionUrl;
 			populateData();
 		};
-		var url = basePath + '/settings?test'  + (test ? 'true': 'false');
+		var url = basePath + '/settings?test='  + (test ? 'true': 'false');
 		xhr.open('GET',url);
 		xhr.send();
 	}
