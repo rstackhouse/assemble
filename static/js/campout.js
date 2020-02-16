@@ -325,7 +325,7 @@
 		if (scouts.length > 0) {
 			items.push({ 
 				name:'Scout ' + event.name + ' registration',
-				amount: calculateUnitPrice(scoutPrice),
+				amount: calculateUnitPrice(scoutPrice).toFixed(2),
 				quantity: scouts.length,
 				itemNumber: ++i
 			})
@@ -333,7 +333,7 @@
 		if (siblings.length > 0) {
 			items.push({ 
 				name:'Sibling ' + event.name + ' registration',
-				amount: calculateUnitPrice(siblingPrice),
+				amount: calculateUnitPrice(siblingPrice).toFixed(2),
 				quantity: siblings.length,
 				itemNumber: ++i
 			})
@@ -341,7 +341,7 @@
 		if (adults.length > 0) {
 			items.push({ 
 				name:'Adult ' + event.name + ' registration',
-				amount: calculateUnitPrice(adultPrice),
+				amount: calculateUnitPrice(adultPrice).toFixed(2),
 				quantity: adults.length,
 				itemNumber: ++i
 			})
