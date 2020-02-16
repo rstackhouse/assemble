@@ -117,7 +117,7 @@
 	<!-- https://developer.paypal.com/docs/paypal-payments-standard/integration-guide/formbasics/ -->
 
 	<script type="text/plain" id="paymentFormTemplate">
-		<form action="{{submissionUrl}}">
+		<form action="{{submissionUrl}}" method="post">
 			<input type="hidden" name="cmd" value="_cart">
 			<input type="hidden" name="charset" value="utf-8">
 			<input type="hidden" name="currency_code" value="USD">
