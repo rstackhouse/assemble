@@ -349,7 +349,7 @@
 		if (scouts.length > 0 || siblings.length > 0 || adults.length > 0) {
 			items.push({ 
 				name:'Processing fee',
-				amount: 0.30,
+				amount: 0.30.toFixed(2),
 				quantity: 1,
 				itemNumber: ++i
 			});
