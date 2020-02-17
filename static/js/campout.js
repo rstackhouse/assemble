@@ -447,6 +447,7 @@
 	function handleViewLoaded() {
 		if (viewSrc != null && documentLoaded) {	
 			bindModal();
+			bindNextButtons();
 			parseTemplate();
 			populateData();
 		}
@@ -483,6 +484,10 @@
 		$(document).on('click', '#add', onSubmit);
 	}
 
+	function bindNextButtons() {
+		$(document).on('click', '.next-button', onNextClicked);
+	}
+
 	function render() {
 		$('#event').html(Mustache.render(eventTemplate, event));
 		$('#scouts').html(Mustache.render(template, { participantType: 'Scouts', participants: scouts }));
@@ -490,6 +495,10 @@
 		$('#adults').html(Mustache.render(template, { participantType: 'Adults', participants: adults }));
 	}
 	
+	function onNextClicked() {
+		$('#participantTypeCarousel').carousel('next');
+	}
+
 	function onSubmit() {
 		var modal = $('#addParticipant');
 		var which = modal.attr('data-which');
