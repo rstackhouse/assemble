@@ -1,23 +1,37 @@
 	<div id="event"></div>
 
-	<div id="scouts"></div>
+	<div id="participantTypeCarousel" class="carousel slide" data-ride="false">
+	  	<div class="carousel-inner">
+	    	
+	    	<div class="carousel-item active">
+				<div id="scouts"></div>
 
-	<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addParticipant" data-which="scout">
-		Add Scout
-	</button>
+				<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addParticipant" data-which="scout">
+					Add Scout
+				</button>
+				<button type="button" class="btn btn-secondary next-button">Next</button>      	
+	    	</div>
+	    	
+	    	<div class="carousel-item">
+	      		<div id="siblings"></div>
 
-	<div id="siblings"></div>
+				<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addParticipant" data-which="sibling">
+					Add Sibling 
+				</button>
+				<button type="button" class="btn btn-secondary next-button">Next</button>
+	    	</div>
+	    	
+	    	<div class="carousel-item">
+	      			<div id="adults"></div>
 
-	<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addParticipant" data-which="sibling">
-		Add Sibling 
-	</button>
+					<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addParticipant" data-which="adult">
+						Add Adult
+					</button>
+					<button type="button" class="btn btn-secondary next-button">Next</button>
+	    	</div>
 
-	<div id="adults"></div>
-
-	<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addParticipant" data-which="adult">
-		Add Adult
-	</button>
-
+		</div>
+	</div>
 
 	<div class="modal fade" id="addParticipant" tabindex="-1" role="dialog" aria-labelledby="participantModalLabel" aria-hidden="true">
 		<div class="modal-dialog" role="document">
