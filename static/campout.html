@@ -4,33 +4,36 @@
 	  	<div class="carousel-inner">
 	    	
 	    	<div class="carousel-item active">
-				<div id="scouts"></div>
-
 				<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addParticipant" data-which="scout">
 					Add Scout
 				</button>
 				<button type="button" class="btn btn-secondary next-button">Next</button>      	
+
+				<div id="scouts"></div>
 	    	</div>
 	    	
 	    	<div class="carousel-item">
-	      		<div id="siblings"></div>
-
+				<button type="button" class="btn btn-secondary prev-button">Prev</button>
 				<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addParticipant" data-which="sibling">
 					Add Sibling 
 				</button>
 				<button type="button" class="btn btn-secondary next-button">Next</button>
+
+	      		<div id="siblings"></div>
 	    	</div>
 	    	
 	    	<div class="carousel-item">
-	      		<div id="adults"></div>
-
+	    		<button type="button" class="btn btn-secondary prev-button">Prev</button>
 				<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addParticipant" data-which="adult">
 						Add Adult
 				</button>
 				<button type="button" class="btn btn-secondary next-button">Next</button>
+
+	      		<div id="adults"></div>
 	    	</div>
 
 	    	<div class="carousel-item">
+	    		<button type="button" class="btn btn-secondary prev-button">Prev</button>
     			<div id="summary"></div>
 
 				<div id="checkout"></div>
@@ -107,7 +110,7 @@
 					{{/isScout}}
 					<dt>Allergies</dt>
 					<dd>{{allergies}}</dd>
-					<dt>DietaryRestrictions</dt>
+					<dt>Dietary Restrictions</dt>
 					<dd>{{dietaryRestrictions}}</dd>
 				</dl>
 			{{/participants}}
