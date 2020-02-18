@@ -201,7 +201,8 @@ def get_event_participants(event_id):
     if participants is None:
         return '', 204
 
-    retval = [ {'first_name':participant.first_name, 
+    retval = [ {'id':participant.id,
+                'first_name':participant.first_name, 
                 'last_name':participant.last_name,
                 'email':participant.email,
                 'age':participant.age,
@@ -265,7 +266,8 @@ def get_event_registration_participants(event_id, registration_id):
     if participants is None:
         return '', 204
 
-    retval = [ {'first_name':participant.first_name, 
+    retval = [ {'id':participant.id,
+                'first_name':participant.first_name, 
                 'last_name':participant.last_name,
                 'email':participant.email,
                 'age':participant.age,
@@ -305,7 +307,7 @@ def handle_ipn(event_id, registration_id):
         response = None
 
         if test:
-            response = requests.post(setting.test_verification_url, data=request_body)
+            response = requests.post(settings.test_verification_url, data=request_body)
         else:
             response = requests.post(settings.verification_url, data=request_body)
 
