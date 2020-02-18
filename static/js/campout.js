@@ -148,7 +148,8 @@
 						age: p.age,
 						den: p.den,
 						allergies: p.allergies,
-						dietaryRestrictions: p.dietary_restrictions
+						dietaryRestrictions: p.dietary_restrictions,
+						isScout: true
 					});
 				}
 				else if (p.participant_type == 'sibling') {
@@ -166,7 +167,8 @@
 						lastName: p.last_name,
 						email: p.email,
 						allergies: p.allergies,
-						dietaryRestrictions: p.dietary_restrictions
+						dietaryRestrictions: p.dietary_restrictions,
+						isAdult: true
 					});
 				}
 			}
