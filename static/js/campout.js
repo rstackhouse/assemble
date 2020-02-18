@@ -143,6 +143,7 @@
 				var p = participants[i];
 				if (p.participant_type == 'scout') {
 					scouts.push({
+						id: p.id,
 						firstName: p.first_name,
 						lastName: p.last_name,
 						age: p.age,
@@ -154,6 +155,7 @@
 				}
 				else if (p.participant_type == 'sibling') {
 					siblings.push({
+						id: p.id,
 						firstName: p.first_name,
 						lastName: p.last_name,
 						age: p.age,
@@ -163,6 +165,7 @@
 				}
 				else if (p.participant_type == 'adult') {
 					adults.push({
+						id: p.id,
 						firstName: p.first_name,
 						lastName: p.last_name,
 						email: p.email,
