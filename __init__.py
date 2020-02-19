@@ -163,7 +163,7 @@ def post_event_participant(event_id):
         json = request.get_json()
 
         if json.get('id', None) != None:
-            participant = Participant.query.filter(Participant.participant_id == json['id']).first()
+            participant = Participant.query.filter(Participant.id == json['id']).first()
 
         if participant == None:
             participant = Participant()
