@@ -151,12 +151,18 @@ def get_event_prices(event_id):
     return json.dumps(retval), 200, {'Content-Type': 'application/json'}
 
 @app.route('/events/<int:event_id>/participants', methods=['POST'])
-def post_event_participants(event_id):
-    # TODO: See if the posted data has an id. If so, this is an update, if not, it is an insert.
-
+def post_event_participant(event_id):
+    
+    create = False
     try:
         json = request.get_json()
-        participant = Participant()
+
+        participant = Participant.query.filter(Participant.participant_id == participant_id).first()
+
+        if participant == None:
+            participant = Participant()
+            create = True
+
         participant.first_name = json['first_name']
         participant.last_name = json['last_name']
         participant.email = json.get('email', None)
@@ -167,8 +173,12 @@ def post_event_participants(event_id):
         participant.dietary_restrictions = json['dietary_restrictions']
         participant.event_id = json['event_id']
         participant.registration_id = json['registration_id']
-        db.session.add(participant)
+        
+        if create:
+            db.session.add(participant)
+        
         db.session.commit()
+
     except:
         exc_type, exc_value, exc_traceback = sys.exc_info()
         f = io.StringIO()
@@ -190,6 +200,30 @@ def post_event_participants(event_id):
             dietary_restrictions=participant.dietary_restrictions,
             event_id=participant.event_id,
             registration_id=participant.registration_id), 201
+
+@app.route('/events/<int:event_id>/participants/<int:participant_id>', methods=['DELETE'])
+def delete_event_participant(event_id, participant_id):
+    participant = None
+    participant_type = None
+
+    try:
+        participant = Participant.query.filter(Participant.participant_id == participant_id).first()
+        participant_type = participant.participant_type
+        db.session.delete(participant)
+        db.session.commit()
+
+    except:
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        f = io.StringIO()
+        traceback.print_tb(exc_traceback, file=f)
+        if exc_value is None:
+            return "Unexpected error: {err}\nTraceback: {tb}".format(err=exc_type,tb=f.getvalue()), 500
+        return "Unexpected error: {err}\nMessage: {msg}\nTraceback: {tb}".format(err=exc_type,msg=exc_value,tb=f.getvalue()), 500
+
+    return jsonify(id=participant_id,
+        participant_type=participant_type), 200
+    
+
 
 @app.route('/events/<int:event_id>/participants')
 def get_event_participants(event_id):

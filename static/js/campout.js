@@ -378,7 +378,6 @@
 	function findScout(firstName) {
 		var scout = null;
 		for (var i = 0; i < scouts.length; i++) {
-			// TODO: Maybe add index column
 			if (scouts[i].firstName == firstName) {
 				scout = scouts[i];
 				break;
@@ -390,7 +389,6 @@
 	function findAdult(firstName) {
 		var adult = null;
 		for (var i = 0; i < adults.length; i++) {
-			// TODO: Maybe add index column
 			if (adults[i].firstName == firstName) {
 				adult = adults[i];
 				break;
@@ -402,7 +400,6 @@
 	function findSibling(firstName) {
 		var sibling = null;
 		for (var i = 0; i < siblings.length; i++) {
-			// TODO: Maybe add index column
 			if (siblings[i].firstName == firstName) {
 				sibling = siblings[i];
 				break;
@@ -432,14 +429,17 @@
 			}
 			if (resp.participant_type == 'scout') {
 				var s = findScout(resp.first_name);
+				s.id = resp.id;
 				s.synced = true;
 			}
 			if (resp.participant_type == 'sibling') {
 				var sib = findSibling(resp.first_name);
+				sib.id = resp.id;
 				sib.synced = true;
 			}
 			if (resp.participant_type == 'adult') {
 				var a = findAdult(resp.first_name);
+				a.id = resp.id;
 				a.synced = true;
 			}
 		};
@@ -449,11 +449,74 @@
 		xhr.send(JSON.stringify(participant));
 	}
 
+	function deleteScout(id) {
+		var ndx = -1;
+		for (var i = 0; i < scouts.length; i++) {
+			if (scouts[i].id == id) {
+				ndx = i;
+				break;
+			}
+		}
+		if (ndx > -1) {
+			scouts.splice(ndx, 1);
+		}
+	}
+
+	function deleteAdult(id) {
+		var ndx = -1;
+		for (var i = 0; i < adults.length; i++) {
+			if (adults[i].id == id) {
+				ndx = i;
+				break;
+			}
+		}
+		if (ndx > -1) {
+			adults.splice(ndx, 1);
+		}
+	}
+
+	function deleteSibling(id) {
+		var ndx = -1;
+		for (var i = 0; i < siblings.length; i++) {
+			if (siblings[i].id == id) {
+				ndx = i;
+				break;
+			}
+		}
+		if (ndx > -1) {
+			siblings.splice(ndx, 1);
+		}
+	}
+
+	function deleteParticipant(id) {
+
+		var xhr = new XMLHttpRequest();
+		xhr.onload = function(e) {
+			resp = JSON.parse(xhr.response);
+			if (window.console) {
+				console.log(resp);
+			}
+			if (resp.participant_type == 'scout') {
+				deleteScout(resp.id);
+			}
+			if (resp.participant_type == 'sibling') {
+				deleteSibling(resp.id);
+			}
+			if (resp.participant_type == 'adult') {
+				deleteAdult(resp.id);
+			}
+		};
+		var url = basePath + '/events/' + eventId + '/participants/' + id;
+		xhr.open('DELETE',url);
+		xhr.send();
+	}
+
 	function handleViewLoaded() {
 		if (viewSrc != null && documentLoaded) {	
 			bindModal();
 			bindNextButtons();
 			bindPrevButtons();
+			bindDeleteButtons();
 			parseTemplate();
 			populateData();
 		}
@@ -498,6 +561,10 @@
 		$(document).on('click', '.prev-button', onPrevClicked);
 	}
 
+	function bindDeleteButtons() {
+		$(document).on('click', '.delete-participant', onDeleteClicked);
+	}
+
 	function render() {
 		$('#event').html(Mustache.render(eventTemplate, event));
 		$('#scouts').html(Mustache.render(template, { participantType: 'Scouts', participants: scouts }));
@@ -505,6 +572,10 @@
 		$('#adults').html(Mustache.render(template, { participantType: 'Adults', participants: adults }));
 	}
 	
+	function onDeleteClicked(e) {
+		var id = $(e.target).attr('data-id');
+	}
+
 	function onNextClicked() {
 		$('#participantTypeCarousel').carousel('next');
 	}

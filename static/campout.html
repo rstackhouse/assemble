@@ -90,8 +90,9 @@
 	<script type="text/plain" id="participantTemplate">
 			<h3>{{participantType}}</h3>
 			<div class="participant-list">
+			<button type="button" class="delete-participant" data-id="{{id}}">x</button>
 			{{#participants}}
-				<dl data-id="{{id}}">
+				<dl>
 					<dt>First Name</dt>
 					<dd>{{firstName}}</dd>
 					<dt>Last Name</dt>
