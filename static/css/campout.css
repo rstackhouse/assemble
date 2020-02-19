@@ -1,0 +1,31 @@
+#participantTypeCarousel dl, dt {
+  font-size: 12px;
+}
+
+#participantTypeCarousel dl {
+  display: grid;
+  grid-template-columns: max-content auto;
+}
+
+#participantTypeCarousel dt {
+  grid-column-start: 1;
+  padding: 0px 10px;
+}
+
+#participantTypeCarousel dd {
+  grid-column-start: 2;
+}
+
+.participant-list div:nth-child(2n) {
+  background-color: lightgray;
+}
+
+.participant {
+	position: relative;
+}
+
+.delete-participant {
+	position: absolute;
+	right: 0px;
+	padding: 0px 10px;
+}

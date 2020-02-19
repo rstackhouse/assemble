@@ -77,6 +77,11 @@ def view(view_name):
 def js(view_name):
     return send_from_directory(app.static_folder + '/js', view_name)
 
+@app.route('/view/css/<string:view_name>')
+def js(view_name):
+    return send_from_directory(app.static_folder + '/css', view_name)
+
+
 @app.route('/events', methods=['POST'])
 def post_event():
     try:
