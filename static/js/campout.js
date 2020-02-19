@@ -519,6 +519,7 @@
 			if (resp.participant_type == 'adult') {
 				deleteAdult(resp.id);
 			}
+			populateData();
 		};
 		var url = basePath + '/events/' + eventId + '/participants/' + id;
 		xhr.open('DELETE',url);
