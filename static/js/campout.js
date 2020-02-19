@@ -28,7 +28,19 @@
 	var iconUrl = null;
 	var returnUrl = location.href;
 	var settings = null;
+	var cssFileName = scriptPath.substr(scriptPath.lastIndexOf('/')).replace('.js', '.css');
 	var test = script.hasAttribute('data-test') ? Boolean(script.getAttribute('data-test')) : false;
+
+	function addStyle(callback) {
+		if (document.querySelectorAll('link[href*=' + cssFileName + ']').length == 0) {
+			var c = document.createElement('link');
+			c.rel="stylesheet";
+			c.href = scriptPath.replace('.js', '.css').replace('/js','/css');;
+			c.onload = callback;
+			loading.push(c);
+			head.appendChild(c);
+		}
+	}
 
 	function addBootstrap(callback) {
 		var head = document.getElementsByTagName('head')[0];
@@ -89,13 +101,14 @@
 	}
 
 	function resourcesLoaded() {
-		return typeof jQuery !== "undefined" && typeof createPopper !== "undefined" && document.querySelectorAll('script[src*=bootstrap]').length !== 0 && document.querySelectorAll('link[href*=bootstrap]').length !== 0 && typeof Mustache !== "undefined";
+		return typeof jQuery !== "undefined" && typeof createPopper !== "undefined" && document.querySelectorAll('link[href*=' + cssFileName + ']').length != 0 && document.querySelectorAll('script[src*=bootstrap]').length !== 0 && document.querySelectorAll('link[href*=bootstrap]').length !== 0 && typeof Mustache !== "undefined";
 	}
 
 	if (resourcesLoaded()) {
 		loadView();
 	}
 	else {
+		addStyle(loadView);
 		addBootstrap(loadView);
 		addMustache(loadView);
 	}
