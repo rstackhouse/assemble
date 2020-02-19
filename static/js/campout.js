@@ -28,11 +28,11 @@
 	var iconUrl = null;
 	var returnUrl = location.href;
 	var settings = null;
-	var cssFileName = scriptPath.substr(scriptPath.lastIndexOf('/')).replace('.js', '.css');
+	var cssBaseFileName = scriptPath.substr(scriptPath.lastIndexOf('/') + 1).replace('.js', '');
 	var test = script.hasAttribute('data-test') ? Boolean(script.getAttribute('data-test')) : false;
 
 	function addStyle(callback) {
-		if (document.querySelectorAll('link[href*=' + cssFileName + ']').length == 0) {
+		if (document.querySelectorAll('link[href*=' + cssBaseFileName + ']').length == 0) {
 			var c = document.createElement('link');
 			c.rel="stylesheet";
 			c.href = scriptPath.replace('.js', '.css').replace('/js','/css');;
@@ -101,7 +101,7 @@
 	}
 
 	function resourcesLoaded() {
-		return typeof jQuery !== "undefined" && typeof createPopper !== "undefined" && document.querySelectorAll('link[href*=' + cssFileName + ']').length != 0 && document.querySelectorAll('script[src*=bootstrap]').length !== 0 && document.querySelectorAll('link[href*=bootstrap]').length !== 0 && typeof Mustache !== "undefined";
+		return typeof jQuery !== "undefined" && typeof createPopper !== "undefined" && document.querySelectorAll('link[href*=' + cssBaseFileName + ']').length != 0 && document.querySelectorAll('script[src*=bootstrap]').length !== 0 && document.querySelectorAll('link[href*=bootstrap]').length !== 0 && typeof Mustache !== "undefined";
 	}
 
 	if (resourcesLoaded()) {
