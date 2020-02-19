@@ -213,7 +213,7 @@ def delete_event_participant(event_id, participant_id):
     participant_type = None
 
     try:
-        participant = Participant.query.filter(Participant.participant_id == participant_id).first()
+        participant = Participant.query.filter(Participant.id == participant_id).first()
         participant_type = participant.participant_type
         db.session.delete(participant)
         db.session.commit()
