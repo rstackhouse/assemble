@@ -78,7 +78,7 @@ def js(view_name):
     return send_from_directory(app.static_folder + '/js', view_name)
 
 @app.route('/view/css/<string:view_name>')
-def js(view_name):
+def css(view_name):
     return send_from_directory(app.static_folder + '/css', view_name)
 
 
@@ -157,12 +157,13 @@ def get_event_prices(event_id):
 
 @app.route('/events/<int:event_id>/participants', methods=['POST'])
 def post_event_participant(event_id):
-    
+    participant = None
     create = False
     try:
         json = request.get_json()
 
-        participant = Participant.query.filter(Participant.participant_id == participant_id).first()
+        if json.get('id', None) != None:
+            participant = Participant.query.filter(Participant.participant_id == json['id']).first()
 
         if participant == None:
             participant = Participant()
