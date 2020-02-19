@@ -32,6 +32,7 @@
 	var test = script.hasAttribute('data-test') ? Boolean(script.getAttribute('data-test')) : false;
 
 	function addStyle(callback) {
+		var head = document.getElementsByTagName('head')[0];
 		if (document.querySelectorAll('link[href*=' + cssBaseFileName + ']').length == 0) {
 			var c = document.createElement('link');
 			c.rel="stylesheet";
