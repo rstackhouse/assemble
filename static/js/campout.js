@@ -456,6 +456,7 @@
 				a.id = resp.id;
 				a.synced = true;
 			}
+			populateData();
 		};
 		var url = basePath + '/events/' + eventId + '/participants';
 		xhr.open('POST',url);
