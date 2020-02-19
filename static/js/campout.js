@@ -588,6 +588,7 @@
 	
 	function onDeleteClicked(e) {
 		var id = $(e.target).attr('data-id');
+		deleteParticipant(id);
 	}
 
 	function onNextClicked() {
