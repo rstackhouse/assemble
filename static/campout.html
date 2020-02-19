@@ -91,29 +91,31 @@
 			<h3>{{participantType}}</h3>
 			<div class="participant-list">
 			{{#participants}}
-				<button type="button" class="delete-participant" data-id="{{id}}">x</button>
-				<dl>
-					<dt>First Name</dt>
-					<dd>{{firstName}}</dd>
-					<dt>Last Name</dt>
-					<dd>{{lastName}}</dd>
-					{{#isAdult}}
-						<dt>Email</dt>
-						<dd>{{email}}</dd>
-					{{/isAdult}}
-					{{^isAdult}}
-						<dt>Age</dt>
-						<dd>{{age}}</dd>
-					{{/isAdult}}
-					{{#isScout}}
-						<dt>Den</dt>
-						<dd>{{den}}</dd>
-					{{/isScout}}
-					<dt>Allergies</dt>
-					<dd>{{allergies}}</dd>
-					<dt>Dietary Restrictions</dt>
-					<dd>{{dietaryRestrictions}}</dd>
-				</dl>
+				<div class="participant">
+					<button type="button" class="delete-participant" data-id="{{id}}">x</button>
+					<dl>
+						<dt>First Name</dt>
+						<dd>{{firstName}}</dd>
+						<dt>Last Name</dt>
+						<dd>{{lastName}}</dd>
+						{{#isAdult}}
+							<dt>Email</dt>
+							<dd>{{email}}</dd>
+						{{/isAdult}}
+						{{^isAdult}}
+							<dt>Age</dt>
+							<dd>{{age}}</dd>
+						{{/isAdult}}
+						{{#isScout}}
+							<dt>Den</dt>
+							<dd>{{den}}</dd>
+						{{/isScout}}
+						<dt>Allergies</dt>
+						<dd>{{allergies}}</dd>
+						<dt>Dietary Restrictions</dt>
+						<dd>{{dietaryRestrictions}}</dd>
+					</dl>
+				</div>
 			{{/participants}}
 			</div>
 	</script>
