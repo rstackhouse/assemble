@@ -385,7 +385,7 @@
 			notifyUrl: notifyUrl,
 			iconUrl: iconUrl,
 			returnUrl: returnUrl,
-			custom: JSON.stringify({ registration_id: registrationId, test: test }).replace('"', '\\"')
+			custom: JSON.stringify({ registration_id: registrationId, test: test }).replace(/"/g, '\\"')
 		});
 
 		$('#checkout').html(checkoutHtml);
