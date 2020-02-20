@@ -618,10 +618,14 @@
 	}
 
 	function render() {
-		$('#event').html(Mustache.render(eventTemplate, event));
-		$('#scouts').html(Mustache.render(template, { participantType: 'Scouts', participants: scouts }));
-		$('#siblings').html(Mustache.render(template, { participantType: 'Siblings', participants: siblings }));
-		$('#adults').html(Mustache.render(template, { participantType: 'Adults', participants: adults }));
+		var eventHtml = Mustache.render(eventTemplate, event);
+		var scoutsHtml = Mustache.render(template, { participantType: 'Scouts', participants: scouts });
+		var siblingsHtml = Mustache.render(template, { participantType: 'Siblings', participants: siblings });
+		var adultsHtml = Mustache.render(template, { participantType: 'Adults', participants: adults });
+		$('#event').html(eventHtml);
+		$('#scouts').html(scoutsHtml);
+		$('#siblings').html(siblingsHtml);
+		$('#adults').html(adultsHtml);
 	}
 	
 	function onDeleteClicked(e) {
