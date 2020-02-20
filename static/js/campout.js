@@ -126,7 +126,7 @@
 	}
 
 	function resourcesLoaded() {
-		return typeof jQuery !== "undefined" && typeof createPopper !== "undefined" && document.querySelectorAll('link[href*=' + cssBaseFileName + ']').length != 0 && document.querySelectorAll('script[src*=bootstrap]').length !== 0 && document.querySelectorAll('link[href*=bootstrap]').length !== 0 && document.querySelectorAll('link[href*=font-awesome]').length != 0 && typeof Mustache !== "undefined";
+		return typeof jQuery !== "undefined" && typeof createPopper !== "undefined" && document.querySelectorAll('link[href*=' + cssBaseFileName + ']').length != 0 && document.querySelectorAll('script[src*=bootstrap]').length !== 0 && document.querySelectorAll('link[href*=bootstrap]').length !== 0 && document.querySelectorAll('link[href*=font-awesome]').length != 0 && document.querySelectorAll('script[src*=font-awesome]').length != 0 && typeof Mustache !== "undefined";
 	}
 
 	if (resourcesLoaded()) {
