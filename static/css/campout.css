@@ -29,3 +29,8 @@
 	right: 0px;
 	padding: 0px 10px;
 }
+
+.edit-participant {
+  position: absolute;
+  right: 30px;
+}

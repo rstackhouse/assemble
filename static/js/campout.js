@@ -43,6 +43,20 @@
 		}
 	}
 
+	function addFontAwesome(callback) {
+		var head = document.getElementsByTagName('head')[0];
+		if (document.querySelectorAll('link[href*=font-awesome]').length == 0) {
+			var c = document.createElement('link');
+			c.rel="stylesheet";
+			c.href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/regular.min.css";
+			c.integrity="sha256-Pd28JXamAUfl4NS9QzGAdbaqdPQGG9dKLj3caGj28fg=";
+			c.crossOrigin="anonymous";
+			c.onload = callback;
+			loading.push(c);
+			head.appendChild(c);
+		}
+	}
+
 	function addBootstrap(callback) {
 		var head = document.getElementsByTagName('head')[0];
 		if (typeof jQuery === "undefined" || jQuery === null) {
@@ -102,7 +116,7 @@
 	}
 
 	function resourcesLoaded() {
-		return typeof jQuery !== "undefined" && typeof createPopper !== "undefined" && document.querySelectorAll('link[href*=' + cssBaseFileName + ']').length != 0 && document.querySelectorAll('script[src*=bootstrap]').length !== 0 && document.querySelectorAll('link[href*=bootstrap]').length !== 0 && typeof Mustache !== "undefined";
+		return typeof jQuery !== "undefined" && typeof createPopper !== "undefined" && document.querySelectorAll('link[href*=' + cssBaseFileName + ']').length != 0 && document.querySelectorAll('script[src*=bootstrap]').length !== 0 && document.querySelectorAll('link[href*=bootstrap]').length !== 0 && document.querySelectorAll('link[href*=font-awesome]').length != 0 && typeof Mustache !== "undefined";
 	}
 
 	if (resourcesLoaded()) {
@@ -111,6 +125,7 @@
 	else {
 		addStyle(loadView);
 		addBootstrap(loadView);
+		addFontAwesome(loadView);
 		addMustache(loadView);
 	}
 
@@ -289,6 +304,24 @@
 		return frag;
 	}
 
+	function editParticipant(id) {
+		var p = findParticipant(id);
+		p.firstName = $('#firstName').val();
+		p.lastName = $('#lastName').val();
+		p.allergies = $('#allergies').val();
+		p.dietaryRestrictions = $('#dietaryRestrictions').val();
+		if (p.isScout) {
+			p.den = $('#den').val();
+		}
+		if (p.isAdult) {
+			p.email = $('#email').val();
+		}
+		if (!p.isAdult) {
+			p.age = $('#age').val();
+		}
+		saveParticipant(p);
+	}
+
 	function addScout() {
 		var form = $('#participantForm');	
 		var scout = {
@@ -391,10 +424,10 @@
 		$('#checkout').html(checkoutHtml);
 	}
 
-	function findScout(firstName) {
+	function findScout(id) {
 		var scout = null;
 		for (var i = 0; i < scouts.length; i++) {
-			if (scouts[i].firstName == firstName) {
+			if (scouts[i].id == id) {
 				scout = scouts[i];
 				break;
 			}
@@ -402,10 +435,10 @@
 		return scout;
 	}
 
-	function findAdult(firstName) {
+	function findAdult(id) {
 		var adult = null;
 		for (var i = 0; i < adults.length; i++) {
-			if (adults[i].firstName == firstName) {
+			if (adults[i].id == id) {
 				adult = adults[i];
 				break;
 			}
@@ -413,15 +446,19 @@
 		return adult;
 	}
 
-	function findSibling(firstName) {
+	function findSibling(id) {
 		var sibling = null;
 		for (var i = 0; i < siblings.length; i++) {
-			if (siblings[i].firstName == firstName) {
+			if (siblings[i].id == id) {
 				sibling = siblings[i];
 				break;
 			}
 		}
 		return sibling;
+	}
+
+	function findParticipant(id) {
+		return findScout(id) || findSibling(id) || findAdult(id);
 	}
 
 	function saveParticipant(p) {
@@ -437,27 +474,19 @@
 			event_id: eventId,
 			registration_id: registrationId
 		};
+
+		if (p.id) {
+			participant.id = p.id;
+		}
+
 		var xhr = new XMLHttpRequest();
 		xhr.onload = function(e) {
 			resp = JSON.parse(xhr.response);
 			if (window.console) {
 				console.log(resp);
 			}
-			if (resp.participant_type == 'scout') {
-				var s = findScout(resp.first_name);
-				s.id = resp.id;
-				s.synced = true;
-			}
-			if (resp.participant_type == 'sibling') {
-				var sib = findSibling(resp.first_name);
-				sib.id = resp.id;
-				sib.synced = true;
-			}
-			if (resp.participant_type == 'adult') {
-				var a = findAdult(resp.first_name);
-				a.id = resp.id;
-				a.synced = true;
-			}
+			p.id = resp.id;
+			p.synced = true;
 			populateData();
 		};
 		var url = basePath + '/events/' + eventId + '/participants';
@@ -535,6 +564,7 @@
 			bindNextButtons();
 			bindPrevButtons();
 			bindDeleteButtons();
+			bindEditButtons();
 			parseTemplate();
 			populateData();
 		}
@@ -567,7 +597,7 @@
 	}
 
 	function bindModal() {
-		$(document).on('show.bs.modal', '#addParticipant', onModalShow); 
+		$(document).on('show.bs.modal', '#addParticipant', onModalShow);
 		$(document).on('click', '#add', onSubmit);
 	}
 
@@ -583,6 +613,10 @@
 		$(document).on('click', '.delete-participant', onDeleteClicked);
 	}
 
+	function bindEditButtons() {
+		$(document).on('click', '.edit-participant', onEditClicked);
+	}
+
 	function render() {
 		$('#event').html(Mustache.render(eventTemplate, event));
 		$('#scouts').html(Mustache.render(template, { participantType: 'Scouts', participants: scouts }));
@@ -593,6 +627,12 @@
 	function onDeleteClicked(e) {
 		var id = $(e.target).attr('data-id');
 		deleteParticipant(id);
+	}
+
+	function onEditClicked(e) {
+		var id = $(e.target).attr('data-id');
+		var p = findParticipant(id);
+		showModal(p.isAdult ? 'adult' : p.isScout ? 'scout' : 'sibling', p);
 	}
 
 	function onNextClicked() {
@@ -606,22 +646,26 @@
 	function onSubmit() {
 		var modal = $('#addParticipant');
 		var which = modal.attr('data-which');
-		if (which === 'scout') {
-			addScout();
+		var id = modal.attr('data-id');
+		if (id) {
+			editParticipant(id);
 		}
-		else if (which === 'adult') {
-			addAdult();
-		}	
-		else {
-			addSibling();
+		else{
+			if (which === 'scout') {
+				addScout();
+			}
+			else if (which === 'adult') {
+				addAdult();
+			}	
+			else {
+				addSibling();
+			}
 		}
 		modal.modal('hide');
 		render();
 	}
 
-	function onModalShow(event) {
-  		var button = $(event.relatedTarget);
-  		var which = button.data('which');
+	function showModal(which, participant) {
   		var modal = $(this);
   		modal.find('.modal-title').text('Add ' + which);
 		if (which !== 'adult') {
@@ -645,14 +689,33 @@
 			$('#den').show();
 		}
 		modal.attr('data-which', which);
-		$('#firstName').val('');
-		$('#lastName').val('');
-		$('#email').val('');
-		$('#den').val('');
-		$('#age').val('');
-		$('#allergies').val('');
-		$('#dietaryRestrictions').val('');
+		if (participant) {
+			modal.attr('data-id', participant.id);
+			$('#firstName').val(participant.firstName);
+			$('#lastName').val(participant.lastName);
+			$('#email').val(participant.email || '');
+			$('#den').val(participant.den || '');
+			$('#age').val(participant.age || '');
+			$('#allergies').val(participant.allergies || '');
+			$('#dietaryRestrictions').val(participant.dietaryRestrictions || '');
+		}
+		else {
+			modal.attr('data-id', '');
+			$('#firstName').val('');
+			$('#lastName').val('');
+			$('#email').val('');
+			$('#den').val('');
+			$('#age').val('');
+			$('#allergies').val('');
+			$('#dietaryRestrictions').val('');
+		}
 		$('#firstName').focus();
+	}
+
+	function onModalShow(event) {
+  		var button = $(event.relatedTarget);
+  		var which = button.data('which');
+  		showModal(which);
 	}
 
 	function strip(str) {
