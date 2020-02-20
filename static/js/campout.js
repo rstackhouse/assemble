@@ -54,16 +54,24 @@
 			c.onload = callback;
 			loading.push(c);
 			head.appendChild(c);
-		}
 
-		if (document.querySelectorAll('script[src*=font-awesome]').length == 0) {
-			var b = document.createElement('script');
-			b.src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/js/fontawesome.min.js";
-			b.integrity="sha256-7zqZLiBDNbfN3W/5aEI1OX/5uvck9V0yhwKOA9Oe49M=";
-			b.crossOrigin="anonymous";
-			b.onload = callback;
-			loading.push(b);
-			head.appendChild(b);
+			var c1 = document.createElement('link');
+			c1.rel="stylesheet";
+			c1.href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/regular.min.css";
+			c1.integrity="sha256-Pd28JXamAUfl4NS9QzGAdbaqdPQGG9dKLj3caGj28fg=";
+			c1.crossOrigin="anonymous";
+			c1.onload = callback;
+			loading.push(c1);
+			head.appendChild(c1);
+
+			var c2 = document.createElement('link');
+			c2.rel="stylesheet";
+			c2.href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/solid.min.css";
+			c2.integrity="sha256-APTxfVyJgjHUS35EeuRpYs2tAbIQO7UF0nAV6krdYJ0=";
+			c2.crossOrigin="anonymous";
+			c2.onload = callback;
+			loading.push(c2);
+			head.appendChild(c2);	
 		}
 	}
 
@@ -126,7 +134,7 @@
 	}
 
 	function resourcesLoaded() {
-		return typeof jQuery !== "undefined" && typeof createPopper !== "undefined" && document.querySelectorAll('link[href*=' + cssBaseFileName + ']').length != 0 && document.querySelectorAll('script[src*=bootstrap]').length !== 0 && document.querySelectorAll('link[href*=bootstrap]').length !== 0 && document.querySelectorAll('link[href*=font-awesome]').length != 0 && document.querySelectorAll('script[src*=font-awesome]').length != 0 && typeof Mustache !== "undefined";
+		return typeof jQuery !== "undefined" && typeof createPopper !== "undefined" && document.querySelectorAll('link[href*=' + cssBaseFileName + ']').length != 0 && document.querySelectorAll('script[src*=bootstrap]').length !== 0 && document.querySelectorAll('link[href*=bootstrap]').length !== 0 && document.querySelectorAll('link[href*=font-awesome]').length == 3 && typeof Mustache !== "undefined";
 	}
 
 	if (resourcesLoaded()) {
