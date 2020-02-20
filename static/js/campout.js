@@ -48,8 +48,8 @@
 		if (document.querySelectorAll('link[href*=font-awesome]').length == 0) {
 			var c = document.createElement('link');
 			c.rel="stylesheet";
-			c.href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/regular.min.css";
-			c.integrity="sha256-Pd28JXamAUfl4NS9QzGAdbaqdPQGG9dKLj3caGj28fg=";
+			c.href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/fontawesome.min.css";
+			c.integrity="sha256-mM6GZq066j2vkC2ojeFbLCcjVzpsrzyMVUnRnEQ5lGw=";
 			c.crossOrigin="anonymous";
 			c.onload = callback;
 			loading.push(c);
