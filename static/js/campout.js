@@ -55,6 +55,16 @@
 			loading.push(c);
 			head.appendChild(c);
 		}
+
+		if (document.querySelectorAll('script[src*=font-awesome]').length == 0) {
+			var b = document.createElement('script');
+			b.src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/js/fontawesome.min.js";
+			b.integrity="sha256-7zqZLiBDNbfN3W/5aEI1OX/5uvck9V0yhwKOA9Oe49M=";
+			b.crossOrigin="anonymous";
+			b.onload = callback;
+			loading.push(b);
+			head.appendChild(b);
+		}
 	}
 
 	function addBootstrap(callback) {
