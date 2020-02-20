@@ -378,7 +378,7 @@
 			items: items
 		}));
 
-		$('#checkout').html(Mustache.render(checkoutTemplate, { 
+		var checkoutHtml = Mustache.render(checkoutTemplate, { 
 			items: items,
 			businessId: businessId,
 			submissionUrl: submissionUrl,
@@ -386,7 +386,9 @@
 			iconUrl: iconUrl,
 			returnUrl: returnUrl,
 			custom: JSON.stringify({ registration_id: registrationId, test: test })
-		}));
+		});
+
+		$('#checkout').html(checkoutHtml);
 	}
 
 	function findScout(firstName) {
