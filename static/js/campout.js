@@ -652,7 +652,8 @@
 	}
 
 	function onEditClicked(e) {
-		var id = $(e.target).attr('data-id');
+		var button = $(e).is('.edit-button') ? $(e) : $(e.target).parents('.edit-participant');
+		var id = button.attr('data-id');
 		var p = findParticipant(id);
 		showModal(p.isAdult ? 'adult' : p.isScout ? 'scout' : 'sibling', p);
 	}
