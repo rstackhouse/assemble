@@ -751,7 +751,7 @@
 		var button = $(e).is('.edit-button') ? $(e) : $(e.target).parents('.edit-participant');
 		var id = button.attr('data-id');
 		var modal = $('#addParticipant');
-		modal.attr('data-id', participant.id);
+		modal.attr('data-id', id);
 		modal.modal('show'); /* Will trigger onModalShow */
 	}
 
