@@ -742,16 +742,17 @@
 	}
 
 	function onModalShow(event) {
-  		var button = $(event.relatedTarget);
-  		var which = button.data('which');
+		var which = event.relatedTarget ? $(event.relatedTarget).attr('data-which') : $('#addParticipant').attr('data-which');
   		populateModal(which);
 	}
 
 	function onEditClicked(e) {
 		var button = $(e).is('.edit-button') ? $(e) : $(e.target).parents('.edit-participant');
 		var id = button.attr('data-id');
+		var which = button.attr('data-which');
 		var modal = $('#addParticipant');
 		modal.attr('data-id', id);
+		modal.attr('data-which', which);
 		modal.modal('show'); /* Will trigger onModalShow */
 	}
 
