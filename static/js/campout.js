@@ -616,6 +616,7 @@
 
 	function bindModal() {
 		$(document).on('show.bs.modal', '#addParticipant', onModalShow);
+		$(document).on('hidden.bs.modal', '#addParticipant', onModalHidden);
 		$(document).on('click', '#add', onSubmit);
 	}
 
@@ -651,13 +652,6 @@
 		deleteParticipant(id);
 	}
 
-	function onEditClicked(e) {
-		var button = $(e).is('.edit-button') ? $(e) : $(e.target).parents('.edit-participant');
-		var id = button.attr('data-id');
-		var p = findParticipant(id);
-		showModal(p.isAdult ? 'adult' : p.isScout ? 'scout' : 'sibling', p);
-	}
-
 	function onNextClicked() {
 		$('#participantTypeCarousel').carousel('next');
 	}
@@ -688,8 +682,14 @@
 		render();
 	}
 
-	function showModal(which, participant) {
-  		var modal = $(this);
+	function populateModal(which) {
+		var participant = null;
+  		var modal = $('#addParticipant');
+		var id = modal.attr('data-id');
+		if (id) {
+		 	participant = findParticipant(id);
+		}
+  		
   		modal.find('.modal-title').text('Add ' + which);
 		if (which !== 'adult') {
 			modal.find('label[for=email]').hide();
@@ -712,6 +712,7 @@
 			$('#den').show();
 		}
 		modal.attr('data-which', which);
+
 		if (participant) {
 			modal.attr('data-id', participant.id);
 			$('#firstName').val(participant.firstName);
@@ -723,22 +724,39 @@
 			$('#dietaryRestrictions').val(participant.dietaryRestrictions || '');
 		}
 		else {
-			modal.attr('data-id', '');
-			$('#firstName').val('');
-			$('#lastName').val('');
-			$('#email').val('');
-			$('#den').val('');
-			$('#age').val('');
-			$('#allergies').val('');
-			$('#dietaryRestrictions').val('');
+			clearModal();	
 		}
 		$('#firstName').focus();
+	}
+
+	function clearModal() {
+		var modal = $('#addParticipant');
+		modal.attr('data-id', '');
+		$('#firstName').val('');
+		$('#lastName').val('');
+		$('#email').val('');
+		$('#den').val('');
+		$('#age').val('');
+		$('#allergies').val('');
+		$('#dietaryRestrictions').val('');
 	}
 
 	function onModalShow(event) {
   		var button = $(event.relatedTarget);
   		var which = button.data('which');
-  		showModal(which);
+  		populateModal(which);
+	}
+
+	function onEditClicked(e) {
+		var button = $(e).is('.edit-button') ? $(e) : $(e.target).parents('.edit-participant');
+		var id = button.attr('data-id');
+		var modal = $('#addParticipant');
+		modal.attr('data-id', participant.id);
+		modal.modal('show'); /* Will trigger onModalShow */
+	}
+
+	function onModalHidden(e) {
+		clearModal();
 	}
 
 	function strip(str) {
