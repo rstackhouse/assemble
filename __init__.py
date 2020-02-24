@@ -330,16 +330,15 @@ def get_event_registration_participants(event_id, registration_id):
 def handle_ipn(event_id, registration_id):
     settings = None
     test = False
-    custom = request.args.get('custom', '')
-
-    if len(custom) > 0:
-        dict = json.loads(custom)
-        test = dict.get('test', False)
 
     try:
         raw = request.get_data().decode('utf-8')
         app.logger.info('Data: %s', raw)
         for key in request.form.keys():
+            if key == 'custom':
+                custom = json.loads(urllib.parse.unquote())
+                test = custom.get('test', False)
+
             app.logger.info('%s: %s', key, str(request.form.get(key)))
 
         settings = Settings.query.get(1)
