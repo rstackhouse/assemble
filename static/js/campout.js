@@ -485,7 +485,7 @@
 			last_name: p.lastName,
 			email: p.email || null,
 			age: p.age || null,
-			age: p.den || null,
+			den: p.den || null,
 			participant_type: p.isAdult ? 'adult' : p.isScout ? 'scout' : 'sibling',
 			allergies: p.allergies,
 			dietary_restrictions: p.dietaryRestrictions,
