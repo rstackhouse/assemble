@@ -328,6 +328,7 @@ def get_event_registration_participants(event_id, registration_id):
 
 @app.route('/events/<int:event_id>/registrations/<string:registration_id>/ipn', methods=['POST'])
 def handle_ipn(event_id, registration_id):
+    app.logger.info("Processing registration {registration_id} for event {event_id}".format(registration_id=registration_id, event_id=event_id))
     settings = None
     test = False
 
