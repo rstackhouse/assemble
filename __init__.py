@@ -345,6 +345,7 @@ def get_event_registration_participants(event_id, registration_id):
     return json.dumps(retval), 200, {'Content-Type': 'application/json'}
 
 # IPN example https://github.com/paypal/ipn-code-samples/blob/master/python/paypal_ipn.py
+# https://developer.paypal.com/docs/ipn/integration-guide/IPNandPDTVariables/
 @app.route('/events/<int:event_id>/registrations/<string:registration_id>/ipn', methods=['POST'])
 def handle_ipn(event_id, registration_id):
     app.logger.info("Processing registration {registration_id} for event {event_id}".format(registration_id=registration_id, event_id=event_id))
@@ -356,26 +357,28 @@ def handle_ipn(event_id, registration_id):
     try:
         raw = request.get_data().decode('utf-8')
         app.logger.info('Data: %s', raw)
-        for key in request.form.keys():
+        form_data = urllib.parse.parse_qs(raw)
+        for key in form_data.keys():
             if key == 'custom':
-                temp = urllib.parse.unquote(request.form.get(key))
+                temp = urllib.parse.unquote(form_data.get(key))
                 app.logger.info("custom field json: {json}".format(json=temp))
                 custom = json.loads(temp)
                 test = custom.get('test', False)
 
             if key.startswith('item_name'):
                 num = key[9:]
+                app.logger.info("Processing item {num}".format(num=num))
                 item = OrderItem()
-                item.name = request.form.get(key)
-                item.amount = request.form.get('mc_gross_' + num)
-                item.quantity = request.form.get('quantity' + num)
+                item.name = form_data.get(key)
+                item.amount = form_data.get('mc_gross_' + num)
+                item.quantity = form_data.get('quantity' + num)
                 item.event_id = event_id
                 item.registration_id = registration_id
                 order_items.append(item)
                 total = total + item.amount * item.quantity
 
 
-            app.logger.info('%s: %s', key, str(request.form.get(key)))
+            app.logger.info('%s: %s', key, str(form_data.get(key)))
 
         settings = Settings.query.get(1)
 
