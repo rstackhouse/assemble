@@ -357,10 +357,12 @@ def handle_ipn(event_id, registration_id):
     try:
         raw = request.get_data().decode('utf-8')
         app.logger.info('Data: %s', raw)
+        # dict of lists
         form_data = urllib.parse.parse_qs(raw)
         for key in form_data.keys():
-            if key == 'custom':
-                temp = urllib.parse.unquote(form_data.get(key))
+            temp_list = form_data.get(key)
+            if key == 'custom' and len(temp_list) > 0:
+                temp = urllib.parse.unquote(temp_list[0])
                 app.logger.info("custom field json: {json}".format(json=temp))
                 custom = json.loads(temp)
                 test = custom.get('test', False)
@@ -369,9 +371,17 @@ def handle_ipn(event_id, registration_id):
                 num = key[9:]
                 app.logger.info("Processing item {num}".format(num=num))
                 item = OrderItem()
-                item.name = form_data.get(key)
-                item.amount = form_data.get('mc_gross_' + num)
-                item.quantity = form_data.get('quantity' + num)
+                if len(temp_list) > 0:
+                    item.name = temp_list[0]
+
+                temp_list = form_data.get('mc_gross_' + num)
+                if len(temp_list) > 0:
+                    item.amount = temp_list[0]
+
+                temp_list = form_data.get('quantity' + num)
+                if len(temp_list) > 0:
+                    item.quantity = int(temp_list[0])
+                
                 item.event_id = event_id
                 item.registration_id = registration_id
                 order_items.append(item)
@@ -414,6 +424,7 @@ def handle_ipn(event_id, registration_id):
             app.logger.error(msg)
             return msg, 500
         msg = "Unexpected error: {err}\nMessage: {msg}\nTraceback: {tb}".format(err=exc_type,msg=exc_value,tb=f.getvalue())
+        app.logger.error(msg)
         return msg, 500
 
 
