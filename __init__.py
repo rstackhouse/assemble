@@ -13,6 +13,7 @@ import logging
 import requests
 import urllib.parse
 
+
 app = Flask(__name__, static_folder='static', static_url_path='')
 
 db = SQLAlchemy(app)
@@ -64,6 +65,25 @@ class Settings(db.Model):
     test_submission_url = db.Column(db.String(100), nullable=False)
     verification_url= db.Column(db.String(100), nullable=False)
     test_verification_url= db.Column(db.String(100), nullable=False)
+    smtp_host = db.Column(db.String(100), nullable=False)
+    smtp_port = db.Column(db.Integer, nullable=False)
+    smtp_login = db.Column(db.String(100), nullable=False)
+    smtp_pass = db.Column(db.String(100), nullable=False)
+    notification_email = db.Column(db.String(100), nullable=False)
+    test_notification_email = db.Column(db.String(100), nullable=False)
+    contact_email = db.Column(db.String(100), nullable=False)
+    test_contact_email = db.Column(db.String(100), nullable=False)
+    organization_name = db.Column(db.String(100), nullable=False)
+    organization_url = db.Column(db.String(100), nullable=False)
+
+class OrderItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
+    registration_id = db.Column(db.String(36), db.ForeignKey('registration.id'), nullable=False)
+
 
 @app.route('/')
 def hello_world():
@@ -325,12 +345,13 @@ def get_event_registration_participants(event_id, registration_id):
     return json.dumps(retval), 200, {'Content-Type': 'application/json'}
 
 # IPN example https://github.com/paypal/ipn-code-samples/blob/master/python/paypal_ipn.py
-
 @app.route('/events/<int:event_id>/registrations/<string:registration_id>/ipn', methods=['POST'])
 def handle_ipn(event_id, registration_id):
     app.logger.info("Processing registration {registration_id} for event {event_id}".format(registration_id=registration_id, event_id=event_id))
     settings = None
     test = False
+    order_items = []
+    total = 0.00
 
     try:
         raw = request.get_data().decode('utf-8')
@@ -341,6 +362,18 @@ def handle_ipn(event_id, registration_id):
                 app.logger.info("custom field json: {json}".format(json=temp))
                 custom = json.loads(temp)
                 test = custom.get('test', False)
+
+            if key.startswith('item_name_'):
+                num = key[10:]
+                item = OrderItem()
+                item.name = request.form.get(key)
+                item.amount = request.form.get('amount_' + num)
+                item.quantity = request.form.get('quantity_' + num)
+                item.event_id = event_id
+                item.registration_id = registration_id
+                order_items.append(item)
+                total = total + item.amount * item.quantity
+
 
             app.logger.info('%s: %s', key, str(request.form.get(key)))
 
@@ -361,6 +394,8 @@ def handle_ipn(event_id, registration_id):
         if response.text == 'VERIFIED':
             registration = Registration.query.filter(Registration.id == registration_id).first()
             registration.completed = True
+            for item in order_items:
+                db.session.add(item)
             db.session.commit()
 
         elif response.text == 'INVALID':
