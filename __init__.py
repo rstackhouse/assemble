@@ -336,7 +336,7 @@ def handle_ipn(event_id, registration_id):
         app.logger.info('Data: %s', raw)
         for key in request.form.keys():
             if key == 'custom':
-                custom = json.loads(urllib.parse.unquote())
+                custom = json.loads(urllib.parse.unquote(request.form.get(key)))
                 test = custom.get('test', False)
 
             app.logger.info('%s: %s', key, str(request.form.get(key)))
