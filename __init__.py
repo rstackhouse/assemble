@@ -404,6 +404,8 @@ def handle_ipn(event_id, registration_id):
         else:
             response = requests.post(settings.verification_url, data=request_body)
 
+        app.logger.info("IPN verification url response: {response}".format(response=response.text))
+
         if response.text == 'VERIFIED':
             registration = Registration.query.filter(Registration.id == registration_id).first()
             registration.completed = True
