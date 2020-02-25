@@ -54,7 +54,7 @@ class Participant(db.Model):
     allergies = db.Column(db.Text)
     dietary_restrictions = db.Column(db.Text)
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
-    registration_id = db.Column(db.Integer, db.ForeignKey('registration.id'), nullable=False)
+    registration_id = db.Column(db.String(36), db.ForeignKey('registration.id'), nullable=False)
 
 class Settings(db.Model):
     id = db.Column(db.Integer, primary_key=True)
