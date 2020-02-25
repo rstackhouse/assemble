@@ -376,7 +376,7 @@ def handle_ipn(event_id, registration_id):
 
                 temp_list = form_data.get('mc_gross_' + num)
                 if len(temp_list) > 0:
-                    item.amount = temp_list[0]
+                    item.amount = float(temp_list[0])
 
                 temp_list = form_data.get('quantity' + num)
                 if len(temp_list) > 0:
@@ -387,8 +387,8 @@ def handle_ipn(event_id, registration_id):
                 order_items.append(item)
                 total = total + item.amount * item.quantity
 
-
-            app.logger.info('%s: %s', key, str(form_data.get(key)))
+            for val in temp_list:
+                app.logger.info('%s: %s', key, val)
 
         settings = Settings.query.get(1)
 
