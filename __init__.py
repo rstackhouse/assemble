@@ -407,14 +407,24 @@ def handle_ipn(event_id, registration_id):
         if settings is None:
             return '', 400
     
-        request_body = urllib.parse.parse_qsl('cmd=_notify-validate&' + raw)
+
+        f = io.BytesIO()
+
+        if charset == 'windows-1252':
+            f.write('cmd=_notify-validate&'.encode('cp1252'))
+        else:
+            f.write('cmd=_notify-validate&'.encode('utf-8'))
+
+        f.write(raw)
+        f.seek(0)
+        
 
         response = None
 
         if test:
-            response = requests.post(settings.test_verification_url, data=request_body)
+            response = requests.post(settings.test_verification_url, data=f)
         else:
-            response = requests.post(settings.verification_url, data=request_body)
+            response = requests.post(settings.verification_url, data=f)
 
         app.logger.info("IPN verification url response: {response}".format(response=response.text))
 
