@@ -355,7 +355,19 @@ def handle_ipn(event_id, registration_id):
     total = 0.00
 
     try:
-        raw = request.get_data().decode('utf-8')
+        raw_data = request.get_data()
+
+        raw = None
+
+        charset = request.form.get('charset')
+
+        app.logger.info("Charset: {charset}".format(charset=charset))
+
+        if charset == 'windows-1252':
+            raw = raw_data.decode('cp1252')
+        else:
+            raw = raw_data.decode('utf-8')
+
         app.logger.info('Data: %s', raw)
         # dict of lists
         form_data = urllib.parse.parse_qs(raw)
