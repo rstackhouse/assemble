@@ -412,10 +412,11 @@ def handle_ipn(event_id, registration_id):
 
         if charset == 'windows-1252':
             f.write('cmd=_notify-validate&'.encode('cp1252'))
+            f.write(raw.encode('cp1252'))
         else:
             f.write('cmd=_notify-validate&'.encode('utf-8'))
-
-        f.write(raw)
+            f.write(raw.encode('utf-8'))
+        
         f.seek(0)
         
 
