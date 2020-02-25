@@ -336,7 +336,9 @@ def handle_ipn(event_id, registration_id):
         app.logger.info('Data: %s', raw)
         for key in request.form.keys():
             if key == 'custom':
-                custom = json.loads(urllib.parse.unquote(request.form.get(key)))
+                temp = urllib.parse.unquote(request.form.get(key))
+                app.logger.info("custom field json: {json}".format(json=temp))
+                custom = json.loads(temp)
                 test = custom.get('test', False)
 
             app.logger.info('%s: %s', key, str(request.form.get(key)))
@@ -364,12 +366,16 @@ def handle_ipn(event_id, registration_id):
             return '', 400
 
     except:
+        msg = None
         exc_type, exc_value, exc_traceback = sys.exc_info()
         f = io.StringIO()
         traceback.print_tb(exc_traceback, file=f)
         if exc_value is None:
-            return "Unexpected error: {err}\nTraceback: {tb}".format(err=exc_type,tb=f.getvalue()), 500
-        return "Unexpected error: {err}\nMessage: {msg}\nTraceback: {tb}".format(err=exc_type,msg=exc_value,tb=f.getvalue()), 500
+            msg = "Unexpected error: {err}\nTraceback: {tb}".format(err=exc_type,tb=f.getvalue())
+            app.logger.error(msg)
+            return msg, 500
+        msg = "Unexpected error: {err}\nMessage: {msg}\nTraceback: {tb}".format(err=exc_type,msg=exc_value,tb=f.getvalue())
+        return msg, 500
 
 
     return '', 200
