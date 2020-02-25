@@ -363,12 +363,12 @@ def handle_ipn(event_id, registration_id):
                 custom = json.loads(temp)
                 test = custom.get('test', False)
 
-            if key.startswith('item_name_'):
-                num = key[10:]
+            if key.startswith('item_name'):
+                num = key[9:]
                 item = OrderItem()
                 item.name = request.form.get(key)
-                item.amount = request.form.get('amount_' + num)
-                item.quantity = request.form.get('quantity_' + num)
+                item.amount = request.form.get('mc_gross_' + num)
+                item.quantity = request.form.get('quantity' + num)
                 item.event_id = event_id
                 item.registration_id = registration_id
                 order_items.append(item)
