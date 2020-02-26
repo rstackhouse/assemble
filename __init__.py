@@ -489,6 +489,24 @@ def handle_ipn(event_id, registration_id):
     try:
         raw_data = request.get_data()
 
+        settings = Settings.query.get(1)
+
+        if settings is None:
+            return '', 500
+
+        registration = Registration.query.filter(Registration.id == registration_id).first()
+
+        if registration is None:
+            return '', 400
+
+        if registration.completed:
+            # We've already gotten the IPN message. Just send the confirmation again.
+            return '', 200
+
+        # Optimistically mark as completed
+        registration.completed = True
+        db.session.commit()
+
         raw = None
 
         charset = request.form.get('charset')
@@ -534,12 +552,6 @@ def handle_ipn(event_id, registration_id):
             for val in temp_list:
                 app.logger.info('%s: %s', key, val)
 
-        settings = Settings.query.get(1)
-
-        if settings is None:
-            return '', 400
-    
-
         f = io.BytesIO()
 
         if charset == 'windows-1252':
@@ -571,6 +583,9 @@ def handle_ipn(event_id, registration_id):
             send_participant_emails(settings, event_id, registration_id, order_items, total, test=test)
 
         elif response.text == 'INVALID':
+            registration = Registration.query.filter(Registration.id == registration_id).first()
+            registration.completed = False
+            db.session.commit()
             return '', 400
 
     except:
