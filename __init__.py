@@ -442,6 +442,7 @@ def send_participant_emails(settings, event_id, registration_id, order_items, to
 
         for participant in participants:
             if participant.email != None and participant.email != '':
+                app.logger.info("Sending email to {email}".format(email=participant.email))
                 message = MIMEMultipart("alternative")
                 message["Subject"] = "{event_name} registration confirmation".format(event_name=evt.name)
                 message["From"] = settings.smtp_login
