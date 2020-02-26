@@ -468,10 +468,12 @@ def send_participant_emails(settings, event_id, registration_id, order_items, to
                 )
 
                 part1 = MIMEText(text, "plain")
-                part2 =MIMEText(html, "html")
+                part2 = MIMEText(html, "html")
 
                 message.attach(part1)
                 message.attach(part2)
+
+                server.sendmail(args.login, participant.email, message.as_string())
 
 # IPN example https://github.com/paypal/ipn-code-samples/blob/master/python/paypal_ipn.py
 # https://developer.paypal.com/docs/ipn/integration-guide/IPNandPDTVariables/
