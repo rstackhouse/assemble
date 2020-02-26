@@ -216,6 +216,7 @@
 						firstName: p.first_name,
 						lastName: p.last_name,
 						email: p.email,
+						phone: p.phone,
 						allergies: p.allergies,
 						dietaryRestrictions: p.dietary_restrictions,
 						isAdult: true
@@ -333,6 +334,7 @@
 		}
 		if (p.isAdult) {
 			p.email = $('#email').val();
+			p.phone = $('#phone').val();
 		}
 		if (!p.isAdult) {
 			p.age = $('#age').val();
@@ -362,7 +364,8 @@
 		var adult = {
 			firstName: $('#firstName').val(),
 			lastName: $('#lastName').val(),
-			email: $('#email').val(),	
+			email: $('#email').val(),
+			phone: $('#phone').val(),	
 			allergies: $('#allergies').val(),
 			dietaryRestrictions: $('#dietaryRestrictions').val(),
 			isScout: false,
@@ -484,6 +487,7 @@
 			first_name: p.firstName,
 			last_name: p.lastName,
 			email: p.email || null,
+			phone: p.phone || null,
 			age: p.age || null,
 			den: p.den || null,
 			participant_type: p.isAdult ? 'adult' : p.isScout ? 'scout' : 'sibling',
@@ -694,12 +698,16 @@
 		if (which !== 'adult') {
 			modal.find('label[for=email]').hide();
 			$('#email').hide();
+			modal.find('label[for=phone]').hide();
+			$('#phone').hide();
 			modal.find('label[for=age]').show();
 			$('#age').show();
 		}
 		else {
 			modal.find('label[for=email]').show();
 			$('#email').show();
+			modal.find('label[for=phone]').show();
+			$('#phone').show();
 			modal.find('label[for=age]').hide();
 			$('#age').hide();
 		}
@@ -718,6 +726,7 @@
 			$('#firstName').val(participant.firstName);
 			$('#lastName').val(participant.lastName);
 			$('#email').val(participant.email || '');
+			$('#phone').val(participant.phone || '');
 			$('#den').val(participant.den || '');
 			$('#age').val(participant.age || '');
 			$('#allergies').val(participant.allergies || '');
@@ -735,6 +744,7 @@
 		$('#firstName').val('');
 		$('#lastName').val('');
 		$('#email').val('');
+		$('#phone').val('');
 		$('#den').val('');
 		$('#age').val('');
 		$('#allergies').val('');
@@ -776,19 +786,19 @@
 	}
 
 	function calculateUnitPrice(price) {
-		// PayPal rate is 0.029% + $0.30
-		// x = subTotal + .029x
-		// .971x = subTotal
-		// x = subTotal / .971
-		return price / .971;
+		// PayPal rate is 2.2% + $0.30
+		// x = subTotal + .022x
+		// .978x = subTotal
+		// x = subTotal / .978
+		return price / .978;
 	}
 
 	function calculateSubtotal(items, price) {
-		// PayPal rate is 0.029% + $0.30
-		// x = subTotal + .029x
-		// .971x = subTotal
-		// x = subTotal / .971
-		return items.length * price / .971;
+		// PayPal rate is 2.2% + $0.30
+		// x = subTotal + .022x
+		// .978x = subTotal
+		// x = subTotal / .978
+		return items.length * price / .978;
 	}
 
 	function calculateTotal() {

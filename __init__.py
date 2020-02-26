@@ -49,6 +49,7 @@ class Participant(db.Model):
     first_name = db.Column(db.String(40), nullable=False)
     last_name = db.Column(db.String(40), nullable=False)
     email = db.Column(db.String(100))
+    phone = db.Column(db.String(20))
     age = db.Column(db.Integer)
     den = db.Column(db.String(10))
     participant_type = db.Column(db.String(25), nullable=False)
@@ -87,7 +88,7 @@ class OrderItem(db.Model):
 
 @app.route('/')
 def hello_world():
-    return render_template('hello.html',uri=app.config['BASE_URI'],date=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),config=os.environ.get('ASSEMBLE_SETTINGS_FILE','duck'),inst=os.environ.get('ASSEMBLE_INSTANCE_PATH','goose'))
+    return render_template('hello.html',uri=app.config['BASE_URI'],date=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),config=os.environ.get('ASSEMBLE_SETTINGS_FILE',''),inst=os.environ.get('ASSEMBLE_INSTANCE_PATH',''))
 
 @app.route('/view/<string:view_name>')
 def view(view_name):
@@ -116,9 +117,13 @@ def post_event():
         exc_type, exc_value, exc_traceback = sys.exc_info()
         f = io.StringIO()
         traceback.print_tb(exc_traceback, file=f)
+        msg = None
         if exc_value is None:
-            return "Unexpected error: {err}\nTraceback: {tb}".format(err=exc_type,tb=f.getvalue()), 500
-        return "Unexpected error: {err}\nMessage: {msg}\nTraceback: {tb}".format(err=exc_type,msg=exc_value,tb=f.getvalue()), 500
+            msg = "Unexpected error: {err}\nTraceback: {tb}".format(err=exc_type,tb=f.getvalue())
+        else:
+            msg = "Unexpected error: {err}\nMessage: {msg}\nTraceback: {tb}".format(err=exc_type,msg=exc_value,tb=f.getvalue())
+        app.logger.error(msg)
+        return  msg, 500
     return '', 201
 
 @app.route('/events/<int:event_id>')
@@ -130,9 +135,13 @@ def get_event(event_id):
         exc_type, exc_value, exc_traceback = sys.exc_info()
         f = io.StringIO()
         traceback.print_tb(exc_traceback, file=f)
+        msg = None
         if exc_value is None:
-            return "Unexpected error: {err}\nTraceback: {tb}".format(err=exc_type,tb=f.getvalue()), 500
-        return "Unexpected error: {err}\nMessage: {msg}\nTraceback: {tb}".format(err=exc_type,msg=exc_value,tb=f.getvalue()), 500
+            msg = "Unexpected error: {err}\nTraceback: {tb}".format(err=exc_type,tb=f.getvalue())
+        else:
+            msg = "Unexpected error: {err}\nMessage: {msg}\nTraceback: {tb}".format(err=exc_type,msg=exc_value,tb=f.getvalue())
+        app.logger.error(msg)
+        return  msg, 500
     if evt is None:
         return '', 204
     return jsonify(id=evt.id,name=evt.name,date=evt.date,description=evt.description), 200
@@ -151,9 +160,13 @@ def post_event_price():
         exc_type, exc_value, exc_traceback = sys.exc_info()
         f = io.StringIO()
         traceback.print_tb(exc_traceback, file=f)
+        msg = None
         if exc_value is None:
-            return "Unexpected error: {err}\nTraceback: {tb}".format(err=exc_type,tb=f.getvalue()), 500
-        return "Unexpected error: {err}\nMessage: {msg}\nTraceback: {tb}".format(err=exc_type,msg=exc_value,tb=f.getvalue()), 500
+            msg = "Unexpected error: {err}\nTraceback: {tb}".format(err=exc_type,tb=f.getvalue())
+        else:
+            msg = "Unexpected error: {err}\nMessage: {msg}\nTraceback: {tb}".format(err=exc_type,msg=exc_value,tb=f.getvalue())
+        app.logger.error(msg)
+        return  msg, 500
     return '', 201
 
 @app.route('/events/<int:event_id>/prices')
@@ -165,9 +178,13 @@ def get_event_prices(event_id):
         exc_type, exc_value, exc_traceback = sys.exc_info()
         f = io.StringIO()
         traceback.print_tb(exc_traceback, file=f)
+        msg = None
         if exc_value is None:
-            return "Unexpected error: {err}\nTraceback: {tb}".format(err=exc_type,tb=f.getvalue()), 500
-        return "Unexpected error: {err}\nMessage: {msg}\nTraceback: {tb}".format(err=exc_type,msg=exc_value,tb=f.getvalue()), 500
+            msg = "Unexpected error: {err}\nTraceback: {tb}".format(err=exc_type,tb=f.getvalue())
+        else:
+            msg = "Unexpected error: {err}\nMessage: {msg}\nTraceback: {tb}".format(err=exc_type,msg=exc_value,tb=f.getvalue())
+        app.logger.error(msg)
+        return  msg, 500
     if prices is None:
         return '', 204
 
@@ -192,6 +209,7 @@ def post_event_participant(event_id):
         participant.first_name = json['first_name']
         participant.last_name = json['last_name']
         participant.email = json.get('email', None)
+        participant.phone = json.get('phone', None)
         participant.age = json.get('age', None)
         participant.den = json.get('den', None)
         participant.participant_type = json['participant_type']
@@ -209,16 +227,20 @@ def post_event_participant(event_id):
         exc_type, exc_value, exc_traceback = sys.exc_info()
         f = io.StringIO()
         traceback.print_tb(exc_traceback, file=f)
+        msg = None
         if exc_value is None:
-            return "Unexpected error: {err}\nTraceback: {tb}".format(err=exc_type,tb=f.getvalue()), 500
-        return "Unexpected error: {err}\nMessage: {msg}\nTraceback: {tb}".format(err=exc_type,msg=exc_value,tb=f.getvalue()), 500
-    
+            msg = "Unexpected error: {err}\nTraceback: {tb}".format(err=exc_type,tb=f.getvalue()), 500
+        else:
+            msg = "Unexpected error: {err}\nMessage: {msg}\nTraceback: {tb}".format(err=exc_type,msg=exc_value,tb=f.getvalue())
+        app.logger.error(msg)
+        return  msg, 500
 
     return jsonify(
             id=participant.id,
             first_name=participant.first_name, 
             last_name=participant.last_name, 
             email=participant.email, 
+            phone=participant.phone, 
             age=participant.age, 
             den=participant.den, 
             participant_type=participant.participant_type,
@@ -242,9 +264,13 @@ def delete_event_participant(event_id, participant_id):
         exc_type, exc_value, exc_traceback = sys.exc_info()
         f = io.StringIO()
         traceback.print_tb(exc_traceback, file=f)
+        msg = None
         if exc_value is None:
-            return "Unexpected error: {err}\nTraceback: {tb}".format(err=exc_type,tb=f.getvalue()), 500
-        return "Unexpected error: {err}\nMessage: {msg}\nTraceback: {tb}".format(err=exc_type,msg=exc_value,tb=f.getvalue()), 500
+            msg = "Unexpected error: {err}\nTraceback: {tb}".format(err=exc_type,tb=f.getvalue())
+        else:
+            msg = "Unexpected error: {err}\nMessage: {msg}\nTraceback: {tb}".format(err=exc_type,msg=exc_value,tb=f.getvalue())
+        app.logger.error(msg)
+        return  msg, 500
 
     return jsonify(id=participant_id,
         participant_type=participant_type), 200
@@ -270,6 +296,7 @@ def get_event_participants(event_id):
                 'first_name':participant.first_name, 
                 'last_name':participant.last_name,
                 'email':participant.email,
+                'phone':participant.phone,
                 'age':participant.age,
                 'den':participant.den,
                 'participant_type':participant.participant_type,
@@ -292,9 +319,13 @@ def create_registration(event_id):
         exc_type, exc_value, exc_traceback = sys.exc_info()
         f = io.StringIO()
         traceback.print_tb(exc_traceback, file=f)
+        msg = None
         if exc_value is None:
-            return "Unexpected error: {err}\nTraceback: {tb}".format(err=exc_type,tb=f.getvalue()), 500
-        return "Unexpected error: {err}\nMessage: {msg}\nTraceback: {tb}".format(err=exc_type,msg=exc_value,tb=f.getvalue()), 500
+            msg = "Unexpected error: {err}\nTraceback: {tb}".format(err=exc_type,tb=f.getvalue()), 500
+        else:
+            msg = "Unexpected error: {err}\nMessage: {msg}\nTraceback: {tb}".format(err=exc_type,msg=exc_value,tb=f.getvalue())
+        app.logger.error(msg)
+        return  msg, 500
     return jsonify(id=registration.id, event_id=registration.event_id), 201
 
 @app.route('/events/<int:event_id>/registrations')
@@ -335,6 +366,7 @@ def get_event_registration_participants(event_id, registration_id):
                 'first_name':participant.first_name, 
                 'last_name':participant.last_name,
                 'email':participant.email,
+                'phone':participant.phone,
                 'age':participant.age,
                 'den':participant.den,
                 'participant_type':participant.participant_type,
@@ -444,11 +476,11 @@ def handle_ipn(event_id, registration_id):
         exc_type, exc_value, exc_traceback = sys.exc_info()
         f = io.StringIO()
         traceback.print_tb(exc_traceback, file=f)
+        msg = None
         if exc_value is None:
             msg = "Unexpected error: {err}\nTraceback: {tb}".format(err=exc_type,tb=f.getvalue())
-            app.logger.error(msg)
-            return msg, 500
-        msg = "Unexpected error: {err}\nMessage: {msg}\nTraceback: {tb}".format(err=exc_type,msg=exc_value,tb=f.getvalue())
+        else: 
+            msg = "Unexpected error: {err}\nMessage: {msg}\nTraceback: {tb}".format(err=exc_type,msg=exc_value,tb=f.getvalue())
         app.logger.error(msg)
         return msg, 500
 
