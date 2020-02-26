@@ -340,7 +340,7 @@ def create_registration(event_id):
         return  msg, 500
     return jsonify(id=registration.id, event_id=registration.event_id), 201
 
-@app.route('/events/<int:event_id>/registrations/<int:registration_id>')
+@app.route('/events/<int:event_id>/registrations/<string:registration_id>')
 def get_registration(event_id, registration_id):
     registration = None
     participants = None
