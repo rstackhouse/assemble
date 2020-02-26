@@ -12,6 +12,9 @@ import uuid
 import logging
 import requests
 import urllib.parse
+import smtplib, ssl
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 
 app = Flask(__name__, static_folder='static', static_url_path='')
@@ -428,6 +431,48 @@ def get_event_registration_participants(event_id, registration_id):
 
     return json.dumps(retval), 200, {'Content-Type': 'application/json'}
 
+
+def send_participant_emails(settings, event_id, registration_id, order_items, total, test=False):
+    evt = Event.query.filter_by(id=event_id).first()
+    participants = Participant.query.filter(Participant.event_id == event_id and Participant.registration_id == registration_id).all()
+
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL(settings.smtp_host, settings.smtp_port, context=context) as server:
+        server.login(settings.smtp_login, settings.smtp_pass)
+
+        for participant in participants:
+            if participant.email != None and participant.email != '':
+                message = MIMEMultipart("alternative")
+                message["Subject"] = "{event_name} registration confirmation".format(evt.name)
+                message["From"] = settings.smtp_login
+                message["To"] = participant.email
+
+                html = render_template('participant-email.html', 
+                    participant=participant,
+                    participants=participants,
+                    event=evt,
+                    order_items=order_items,
+                    contact_email=settings.test_contact_email if test else settings.contact_email,
+                    organization_name=settings.organization_name,
+                    organization_url=settings.organization_url
+                )
+
+                text = render_template('participant-email.txt', 
+                    participant=participant,
+                    participants=participants,
+                    event=evt,
+                    order_items=order_items,
+                    contact_email=settings.test_contact_email if test else settings.contact_email,
+                    organization_name=settings.organization_name,
+                    organization_url=settings.organization_url
+                )
+
+                part1 = MIMEText(text, "plain")
+                part2 =MIMEText(html, "html")
+
+                message.attach(part1)
+                message.attach(part2)
+
 # IPN example https://github.com/paypal/ipn-code-samples/blob/master/python/paypal_ipn.py
 # https://developer.paypal.com/docs/ipn/integration-guide/IPNandPDTVariables/
 @app.route('/events/<int:event_id>/registrations/<string:registration_id>/ipn', methods=['POST'])
@@ -519,6 +564,8 @@ def handle_ipn(event_id, registration_id):
             for item in order_items:
                 db.session.add(item)
             db.session.commit()
+
+            send_participant_emails(settings, event_id, registration_id, order_items, total, test=test)
 
         elif response.text == 'INVALID':
             return '', 400

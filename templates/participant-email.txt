@@ -1,0 +1,20 @@
+{{ participant.first_name }} {{ participant.last_name }}, thank you for registering for {{ event.name }}. Below you will find a summary of your registration:
+
+Attendees:
+         
+{% for attendee in participants %}
+First Name: {{ attendee.first_name }}
+Last Name: {{ attendee.last_name }}
+Allergies: {{ attendee.allergies }}
+Dietary Restrictions: {{ attendee.dietary_restrictions }}
+{% endfor %}
+
+Order Summary:
+
+{% for order_item in order_items %}
+    Description: {{ order_item.name }} Amount: {{ order_item.amount }} Quantity: {{ order_item.quantity }}
+{% endfor %}    
+            
+Please email {{ contact_email }} if you have any questions about your registration.
+        
+{{ organization_name }} {{ organization_url }}

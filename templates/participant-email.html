@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+    <head>
+    </head>
+    <body>
+        <main>
+            <p>{{ participant.first_name }} {{ participant.last_name }}, thank you for registering for {{ event.name }}. Below you will find a summary of your registration:</p>
+
+            <h2>Attendees</h2>
+            {% for attendee in participants %}
+                <dl>
+                    <dt>First Name</dt><dd>{{ attendee.first_name }}</dd>
+                    <dt>Last Name</dt><dd>{{ attendee.last_name }}</dd>
+                    <dt>Allergies</dt><dd>{{ attendee.allergies }}</dd>
+                    <dt>Dietary Restrictions</dt><dd>{{ attendee.dietary_restrictions }}</dd>
+                </dl>
+            {% endfor %}
+
+            <h2>Order Summary</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Amount</th>
+                        <th>Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order_item in order_items %}
+                        <tr>
+                            <td>{{ order_item.name }}</td>
+                            <td>{{ order_item.amount }}</td>
+                            <td>{{ order_item.quantity }}</td>
+                        </tr>
+                    {% endfor %}    
+                </tbody>
+            </table>
+            <p>Please email <a href="mailto:{{ contact_email }}">{{ contact_email }}</a> if you have any questions about your registration.</p>
+        </main>
+        <footer>{{ organization_name }} <a href="{{ organization_url }}" target="_blank">{{ organization_url }}</a></footer>
+    </body>
+</html>
