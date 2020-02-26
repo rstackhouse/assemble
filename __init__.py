@@ -443,7 +443,7 @@ def send_participant_emails(settings, event_id, registration_id, order_items, to
         for participant in participants:
             if participant.email != None and participant.email != '':
                 message = MIMEMultipart("alternative")
-                message["Subject"] = "{event_name} registration confirmation".format(evt.name)
+                message["Subject"] = "{event_name} registration confirmation".format(event_name=evt.name)
                 message["From"] = settings.smtp_login
                 message["To"] = participant.email
 
