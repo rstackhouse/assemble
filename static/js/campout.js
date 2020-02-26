@@ -757,7 +757,7 @@
 	}
 
 	function onEditClicked(e) {
-		var button = $(e.target).is('.edit-button') ? $(e.target) : $(e.target).parents('.edit-participant');
+		var button = $(e.target).is('.edit-participant') ? $(e.target) : $(e.target).parents('.edit-participant');
 		var id = button.attr('data-id');
 		var which = button.attr('data-which');
 		var modal = $('#addParticipant');
