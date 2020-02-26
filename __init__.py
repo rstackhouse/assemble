@@ -150,7 +150,7 @@ def get_event(event_id):
     retval = {
         'id': evt.id,
         'name':evt.name,
-        'date':evt.date..strftime('%Y-%d-%m %H:%M'),
+        'date':evt.date.strftime('%Y-%d-%m %H:%M'),
         'description':evt.description
     }
 
