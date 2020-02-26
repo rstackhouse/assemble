@@ -17,8 +17,9 @@
 	var summaryTemplate = null;
 	var event = null;
 	var eventPrices = null;
-	var fetchingParticipants = false;
+	var fetchingRegistration = false;
 	var registrationId = localStorage.getItem('registrationId');
+	var registration = null;
 	var scoutPrice = null;
 	var siblingPrice = null;
 	var adultPrice = null;
@@ -163,7 +164,6 @@
 	function getData() {
 		getSettings();
 		getEvent();
-		getEventPrices();
 	}
 
 	if (registrationId) {
@@ -172,22 +172,28 @@
 			console.log('Resuming with registration: ' + registrationId);
 		}
 		getData();
-		getParticipants();
+		getRegistration();
 	}
 	else {
 		getData();
 		createRegistration();
 	}
 
-	function getParticipants() {
-		fetchingParticipants = true;
+	function getRegistration() {
+		fetchingRegistration = true;
 		var xhr = new XMLHttpRequest();
 		xhr.onload = function(e) {
-			fetchingParticipants = false;
-			participants = JSON.parse(xhr.response);
+			fetchingRegistration = false;
+			r = JSON.parse(xhr.response);
 
-			for (var i = 0; i < participants.length; i++) {
-				var p = participants[i];
+			registration = {
+				id: r.id,
+				event_id: r.event_id,
+				completed: r.completed
+			};
+
+			for (var i = 0; i < registration.participants.length; i++) {
+				var p = registration.participants[i];
 				if (p.participant_type == 'scout') {
 					scouts.push({
 						id: p.id,
@@ -226,7 +232,7 @@
 
 			populateData();
 		};
-		var url = basePath + '/events/' + eventId + '/registrations/' + registrationId + '/participants';
+		var url = basePath + '/events/' + eventId + '/registrations/' + registrationId;
 		xhr.open('GET',url);
 		xhr.send();
 	}
@@ -252,21 +258,18 @@
 	function getEvent() {
 		var xhr = new XMLHttpRequest();
 		xhr.onload = function(e) {
-			event = JSON.parse(xhr.response);
-			populateData();
-		};
-		var url = basePath + '/events/' + eventId;
-		xhr.open('GET',url);
-		xhr.send();
-	}
+			evt = JSON.parse(xhr.response);
 
-	function getEventPrices() {
-		var xhr = new XMLHttpRequest();
-		xhr.onload = function(e) {
-			prices = JSON.parse(xhr.response);
+			event = {
+				id: evt.id,
+				name: evt.name,
+				date: evt.date,
+				description: evt.description
+			};
+			
 			eventPrices = [];
-			for (var i = 0; i < prices.length; i++) {
-				var p = prices[i];
+			for (var i = 0; i < evt.prices.length; i++) {
+				var p = evt.prices[i];
 				var price = {
 					price: p.price,
 					participantType: p.participant_type
@@ -284,14 +287,15 @@
 			}
 
 			populateData();
+
 		};
-		var url = basePath + '/events/' + eventId + '/prices';
+		var url = basePath + '/events/' + eventId;
 		xhr.open('GET',url);
 		xhr.send();
 	}
 
 	function canPopulateData() {
-		return registrationId != null && settings != null && !fetchingParticipants && viewSrc != null && event != null && eventPrices != null;
+		return registrationId != null && settings != null && !fetchingRegistration && viewSrc != null && event != null && eventPrices != null;
 	}
 
 	function populateData() {

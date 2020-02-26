@@ -129,8 +129,10 @@ def post_event():
 @app.route('/events/<int:event_id>')
 def get_event(event_id):
     evt = None
+    prices = None
     try:
         evt = Event.query.filter_by(id=event_id).first()
+        prices = EventPrice.query.filter(EventPrice.event_id).all()
     except:
         exc_type, exc_value, exc_traceback = sys.exc_info()
         f = io.StringIO()
@@ -144,7 +146,17 @@ def get_event(event_id):
         return  msg, 500
     if evt is None:
         return '', 204
-    return jsonify(id=evt.id,name=evt.name,date=evt.date,description=evt.description), 200
+
+    retval = {
+        'id': evt.id,
+        'name':evt.name,
+        'date':evt.date,
+        'description':evt.description
+    }
+
+    retval['prices'] = [ {'price':price.price, 'participant_type':price.participant_type, 'event_id':price.event_id} for price in prices ]
+
+    return json.dumps(retval), 200, {'Content-Type': 'application/json'}
 
 @app.route('/events/prices', methods=['POST'])
 def post_event_price():
@@ -327,6 +339,46 @@ def create_registration(event_id):
         app.logger.error(msg)
         return  msg, 500
     return jsonify(id=registration.id, event_id=registration.event_id), 201
+
+@app.route('/events/<int:event_id>/registrations/<int:registration_id>')
+def get_registration(event_id, registration_id):
+    registration = None
+    participants = None
+
+    try:
+        registration = Registration.query.filter(Registration.id == registration_id).first()
+        participants = Participant.query.filter(Participant.event_id == event_id and Participant.registration_id == registration_id).all()
+    except:
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        f = io.StringIO()
+        traceback.print_tb(exc_traceback, file=f)
+        msg = None
+        if exc_value is None:
+            msg = "Unexpected error: {err}\nTraceback: {tb}".format(err=exc_type,tb=f.getvalue()), 500
+        else:
+            msg = "Unexpected error: {err}\nMessage: {msg}\nTraceback: {tb}".format(err=exc_type,msg=exc_value,tb=f.getvalue())
+        app.logger.error(msg)
+        return  msg, 500
+
+    retval = {
+        'id':registration.id,
+        'event_id':registration.event_id,
+        'completed':registration.completed
+    }
+
+    retval['participants'] = [ {'id':participant.id,
+                'first_name':participant.first_name, 
+                'last_name':participant.last_name,
+                'email':participant.email,
+                'phone':participant.phone,
+                'age':participant.age,
+                'den':participant.den,
+                'participant_type':participant.participant_type,
+                'allergies':participant.allergies,
+                'dietary_restrictions':participant.dietary_restrictions, 
+                'event_id':participant.event_id} for participant in participants ]
+
+    return json.dumps(retval), 200, {'Content-Type': 'application/json'}
 
 @app.route('/events/<int:event_id>/registrations')
 def get_event_registrations(event_id):
