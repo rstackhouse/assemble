@@ -192,8 +192,8 @@
 				completed: r.completed
 			};
 
-			for (var i = 0; i < registration.participants.length; i++) {
-				var p = registration.participants[i];
+			for (var i = 0; i < r.participants.length; i++) {
+				var p = r.participants[i];
 				if (p.participant_type == 'scout') {
 					scouts.push({
 						id: p.id,
