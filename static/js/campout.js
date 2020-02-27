@@ -600,6 +600,7 @@
 			bindPrevButtons();
 			bindDeleteButtons();
 			bindEditButtons();
+			bindFieldBlur();
 			parseTemplate();
 			populateData();
 		}
@@ -653,6 +654,10 @@
 		$(document).on('click', '.edit-participant', onEditClicked);
 	}
 
+	function bindFieldBlur() {
+		$(document).on('blur', '#participantForm input, #participantForm textarea', onFieldBlur);
+	}
+
 	function render() {
 		var eventHtml = Mustache.render(eventTemplate, event);
 		var scoutsHtml = Mustache.render(template, { participantType: 'Scouts', participants: scouts });
@@ -684,6 +689,11 @@
 
 	function onPrevClicked() {
 		$('#registrationCarousel').carousel('prev');
+	}
+
+	function onFieldBlur(e) {
+		var valid = Boolean($(e.target).val());
+		$(e.target).css('background-color', valid ? 'inherit' : 'pink');
 	}
 
 	function onSubmit() {
