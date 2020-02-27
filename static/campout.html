@@ -151,12 +151,19 @@
 	<script type="text/plain" id="summaryTemplate">
 		<div>
 			<table>
+				<thead>
+					<tr>
+						<th>Quantity</th>
+						<th>Item Name</th>
+						<th>Price</th>
+					</tr>
+				</thead>
 				<tbody>
 				{{#items}}
 					<tr>
 						<td class="quantity">{{quantity}}</td>
 						<td>{{name}}</td>
-						<td>${{amount}}</td>
+						<td>&#64;&nbsp;&#36;${{amount}}</td>
 					</tr>
 				{{/items}}
 				</tbody>
