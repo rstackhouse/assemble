@@ -35,3 +35,7 @@
   right: 30px;
   padding: 0px 10px;
 }
+
+.carousel .carousel-item {
+    transition-duration: 0.5s;
+}
