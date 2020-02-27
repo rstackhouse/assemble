@@ -52,3 +52,7 @@
 #summary .quantity {
   text-align: left;
 }
+
+#summary td {
+  font-size: 10pt;
+}
