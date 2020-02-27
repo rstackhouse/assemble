@@ -663,7 +663,9 @@
 		var scoutsHtml = Mustache.render(template, { participantType: 'Scouts', participants: scouts });
 		var siblingsHtml = Mustache.render(template, { participantType: 'Siblings', participants: siblings });
 		var adultsHtml = Mustache.render(template, { participantType: 'Adults', participants: adults });
+		$('#loading').hide();
 		if (!registration || !registration.completed) {
+			$('#registrationCarousel').show();
 			$('#event').html(eventHtml);
 			$('#scouts').html(scoutsHtml);
 			$('#siblings').html(siblingsHtml);
