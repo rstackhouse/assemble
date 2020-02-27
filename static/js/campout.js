@@ -232,7 +232,7 @@
 
 			populateData();
 		};
-		var url = basePath + '/events/' + eventId + '/registrations/' + registrationId;
+		var url = basePath + '/events/' + eventId + '/registrations/' + registrationId + '?' + String((new Date()).getTime());
 		xhr.open('GET',url);
 		xhr.send();
 	}
@@ -250,7 +250,7 @@
 			submissionUrl = settings.submissionUrl;
 			populateData();
 		};
-		var url = basePath + '/settings?test='  + (test ? 'true': 'false');
+		var url = basePath + '/settings?test='  + (test ? 'true': 'false') +  '&' + String((new Date()).getTime());
 		xhr.open('GET',url);
 		xhr.send();
 	}
@@ -289,7 +289,7 @@
 			populateData();
 
 		};
-		var url = basePath + '/events/' + eventId;
+		var url = basePath + '/events/' + eventId + '?' + String((new Date()).getTime());
 		xhr.open('GET',url);
 		xhr.send();
 	}

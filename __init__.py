@@ -494,17 +494,17 @@ def handle_ipn(event_id, registration_id):
         if settings is None:
             return '', 500
 
-        registration = Registration.query.filter(Registration.id == registration_id).first()
+        check = Registration.query.filter(Registration.id == registration_id).first()
 
-        if registration is None:
+        if check is None:
             return '', 400
 
-        if registration.completed:
+        if check.completed:
             # We've already gotten the IPN message. Just send the confirmation again.
             return '', 200
 
         # Optimistically mark as completed
-        registration.completed = True
+        check.completed = True
         db.session.commit()
 
         raw = None
@@ -574,8 +574,6 @@ def handle_ipn(event_id, registration_id):
         app.logger.info("IPN verification url response: {response}".format(response=response.text))
 
         if response.text == 'VERIFIED':
-            registration = Registration.query.filter(Registration.id == registration_id).first()
-            registration.completed = True
             for item in order_items:
                 db.session.add(item)
             db.session.commit()
