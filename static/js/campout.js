@@ -690,21 +690,7 @@
 		var modal = $('#addParticipant');
 		var which = modal.attr('data-which');
 		var id = modal.attr('data-id');
-		if (id) {
-			editParticipant(id);
-		}
-		else{
-			if (which === 'scout') {
-				addScout();
-			}
-			else if (which === 'adult') {
-				addAdult();
-			}	
-			else {
-				addSibling();
-			}
-		}
-
+		
 		var inputs = $('#participantForm').find('input:visible, textarea:visible');
 
 		var valid = true;
@@ -715,6 +701,21 @@
 		});
 
 		if (valid) {
+			if (id) {
+				editParticipant(id);
+			}
+			else{
+				if (which === 'scout') {
+					addScout();
+				}
+				else if (which === 'adult') {
+					addAdult();
+				}	
+				else {
+					addSibling();
+				}
+			}
+
 			modal.modal('hide');
 			render();
 		}
