@@ -1,12 +1,33 @@
 <!doctype html>
 <html>
     <head>
+        <style type="text/css">
+            .participant-list dl,
+            .participant-list dt {
+              font-size: 12px;
+            }
+
+            .participant-list dl {
+              display: grid;
+              grid-template-columns: max-content auto;
+            }
+
+            .participant-list dt {
+              grid-column-start: 1;
+              padding: 0px 10px;
+            }
+
+            .participant-list dd {
+              grid-column-start: 2;
+            }
+        </style>
     </head>
     <body>
         <main>
             <p>{{ participant.first_name }} {{ participant.last_name }}, thank you for registering for {{ event.name }}. Below you will find a summary of your registration:</p>
 
             <h2>Attendees</h2>
+            <div class="participant-list">
             {% for attendee in participants %}
                 <dl>
                     <dt>First Name</dt><dd>{{ attendee.first_name }}</dd>
@@ -15,6 +36,7 @@
                     <dt>Dietary Restrictions</dt><dd>{{ attendee.dietary_restrictions }}</dd>
                 </dl>
             {% endfor %}
+            </div>
 
             <h2>Order Summary</h2>
             <table>

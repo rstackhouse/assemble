@@ -665,6 +665,7 @@
 			$('#adults').html(adultsHtml);
 		}
 		else {
+			$('#thanks').html('Thank you for registering!');
 			$('#registrationCarousel').hide();
 			$('#finalScouts').html(scoutsHtml);
 			$('#finalSiblings').html(siblingsHtml);
