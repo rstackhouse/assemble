@@ -432,21 +432,30 @@
 			});
 		}
 
-		$('#summary').html(Mustache.render(summaryTemplate, {
-			items: items
-		}));
+		if (!registration || !registration.completed) {
+			$('#summary').html(Mustache.render(summaryTemplate, {
+				items: items
+			}));
+		}
+		else {
+			$('#finalSummary').html(Mustache.render(summaryTemplate, {
+				items: items
+			}));
+		}
 
-		var checkoutHtml = Mustache.render(checkoutTemplate, { 
-			items: items,
-			businessId: businessId,
-			submissionUrl: submissionUrl,
-			notifyUrl: notifyUrl,
-			iconUrl: iconUrl,
-			returnUrl: returnUrl,
-			custom: encodeURIComponent(JSON.stringify({ registration_id: registrationId, test: test }))
-		});
+		if (!registration || !registration.completed) {
+			var checkoutHtml = Mustache.render(checkoutTemplate, { 
+				items: items,
+				businessId: businessId,
+				submissionUrl: submissionUrl,
+				notifyUrl: notifyUrl,
+				iconUrl: iconUrl,
+				returnUrl: returnUrl,
+				custom: encodeURIComponent(JSON.stringify({ registration_id: registrationId, test: test }))
+			});
 
-		$('#checkout').html(checkoutHtml);
+			$('#checkout').html(checkoutHtml);
+		}
 	}
 
 	function findScout(id) {
@@ -649,10 +658,18 @@
 		var scoutsHtml = Mustache.render(template, { participantType: 'Scouts', participants: scouts });
 		var siblingsHtml = Mustache.render(template, { participantType: 'Siblings', participants: siblings });
 		var adultsHtml = Mustache.render(template, { participantType: 'Adults', participants: adults });
-		$('#event').html(eventHtml);
-		$('#scouts').html(scoutsHtml);
-		$('#siblings').html(siblingsHtml);
-		$('#adults').html(adultsHtml);
+		if (!registration || !registration.completed) {
+			$('#event').html(eventHtml);
+			$('#scouts').html(scoutsHtml);
+			$('#siblings').html(siblingsHtml);
+			$('#adults').html(adultsHtml);
+		}
+		else {
+			$('#registrationCarousel').hide();
+			$('#finalScouts').html(scoutsHtml);
+			$('#finalSiblings').html(siblingsHtml);
+			$('#finalAdults').html(adultsHtml);
+		}
 	}
 	
 	function onDeleteClicked(e) {
@@ -661,11 +678,11 @@
 	}
 
 	function onNextClicked() {
-		$('#participantTypeCarousel').carousel('next');
+		$('#registrationCarousel').carousel('next');
 	}
 
 	function onPrevClicked() {
-		$('#participantTypeCarousel').carousel('prev');
+		$('#registrationCarousel').carousel('prev');
 	}
 
 	function onSubmit() {

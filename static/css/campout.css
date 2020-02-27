@@ -1,18 +1,18 @@
-#participantTypeCarousel dl, dt {
+#registrationCarousel dl, dt {
   font-size: 12px;
 }
 
-#participantTypeCarousel dl {
+#registrationCarousel dl {
   display: grid;
   grid-template-columns: max-content auto;
 }
 
-#participantTypeCarousel dt {
+#registrationCarousel dt {
   grid-column-start: 1;
   padding: 0px 10px;
 }
 
-#participantTypeCarousel dd {
+#registrationCarousel dd {
   grid-column-start: 2;
 }
 
