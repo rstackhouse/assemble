@@ -605,7 +605,7 @@ def handle_ipn(event_id, registration_id):
 @app.route('/settings')
 def get_settings():
     settings = None
-    test = request.args.get('test', False)
+    test = True if request.args.get('test', 'false') == 'true' else False
     try:
         settings = Settings.query.get(1)
     except:
