@@ -704,8 +704,20 @@
 				addSibling();
 			}
 		}
-		modal.modal('hide');
-		render();
+
+		var inputs = $('#participantForm').find('input:visible, textarea:visible');
+
+		var valid = true;
+		inputs.each(function(i, a){
+			var tmp = Boolean($(a).val());
+			$(a).css('background-color', tmp ? 'inherit' : 'pink');
+			valid = valid && tmp;
+		});
+
+		if (valid) {
+			modal.modal('hide');
+			render();
+		}
 	}
 
 	function populateModal(which) {
