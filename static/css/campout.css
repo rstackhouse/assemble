@@ -1,18 +1,19 @@
-#registrationCarousel dl, dt {
+.participant-list dl,
+.participant-list dt {
   font-size: 12px;
 }
 
-#registrationCarousel dl {
+.participant-list dl {
   display: grid;
   grid-template-columns: max-content auto;
 }
 
-#registrationCarousel dt {
+.participant-list dt {
   grid-column-start: 1;
   padding: 0px 10px;
 }
 
-#registrationCarousel dd {
+.participant-list dd {
   grid-column-start: 2;
 }
 
@@ -30,10 +31,18 @@
 	padding: 0px 10px;
 }
 
+#final .delete-participant {
+  display: none;
+}
+
 .edit-participant {
   position: absolute;
   right: 30px;
   padding: 0px 10px;
+}
+
+#final .edit-participant {
+  display: none;;
 }
 
 .carousel .carousel-item {
