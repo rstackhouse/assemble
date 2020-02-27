@@ -48,3 +48,7 @@
 .carousel .carousel-item {
     transition-duration: 0.5s;
 }
+
+#summary table > tbody > tr > td:nth-child(2) {
+  text-align: center;
+}
