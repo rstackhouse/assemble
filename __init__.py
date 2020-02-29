@@ -2,6 +2,7 @@ from flask import Flask, render_template, send_from_directory
 from flask import request
 from flask import jsonify
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import and_
 import datetime
 import os
 import sys
@@ -351,7 +352,7 @@ def get_registration(event_id, registration_id):
     app.logger.info("Received registration query for event {event} and registration {registration}".format(event=event_id, registration=registration_id))
     try:
         registration = Registration.query.filter(Registration.id == registration_id).first()
-        participants = Participant.query.filter(Participant.event_id == event_id and Participant.registration_id == registration_id).all()
+        participants = Participant.query.filter(and_(Participant.event_id == event_id, Participant.registration_id == registration_id)).all()
     except:
         exc_type, exc_value, exc_traceback = sys.exc_info()
         f = io.StringIO()
@@ -401,7 +402,7 @@ def get_event_registrations(event_id):
             registrations = Registration.query.filter(Registration.completed == True).all()
   
         for registration in registrations:        
-            participants = Participant.query.filter(Participant.event_id == event_id and Participant.registration_id == registration.id).all()
+            participants = Participant.query.filter(and_(Participant.event_id == event_id, Participant.registration_id == registration.id)).all()
 
             reg = {'id':registration.id, 'event_id':registration.event_id, 'completed':registration.completed}
 
@@ -437,7 +438,7 @@ def get_event_registrations(event_id):
 def get_event_registration_participants(event_id, registration_id):
     participants = None
     try:
-        participants = Participant.query.filter(Participant.event_id == event_id and Participant.registration_id == registration_id).all()
+        participants = Participant.query.filter(and_(Participant.event_id == event_id, Participant.registration_id == registration_id)).all()
     except:
         exc_type, exc_value, exc_traceback = sys.exc_info()
         f = io.StringIO()
@@ -465,7 +466,7 @@ def get_event_registration_participants(event_id, registration_id):
 
 def send_participant_emails(settings, event_id, registration_id, order_items, total, test=False):
     evt = Event.query.filter_by(id=event_id).first()
-    participants = Participant.query.filter(Participant.event_id == event_id and Participant.registration_id == registration_id).all()
+    participants = Participant.query.filter(and_(Participant.event_id == event_id, Participant.registration_id == registration_id)).all()
 
     context = ssl.create_default_context()
     with smtplib.SMTP_SSL(settings.smtp_host, settings.smtp_port, context=context) as server:
