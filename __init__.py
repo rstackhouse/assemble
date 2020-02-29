@@ -348,6 +348,7 @@ def get_registration(event_id, registration_id):
     registration = None
     participants = None
 
+    app.logger.info("Received registration query for event {event} and registration {registration}".format(event=event_id, registration=registration_id))
     try:
         registration = Registration.query.filter(Registration.id == registration_id).first()
         participants = Participant.query.filter(Participant.event_id == event_id and Participant.registration_id == registration_id).all()
