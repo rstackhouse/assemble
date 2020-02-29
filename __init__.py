@@ -385,20 +385,50 @@ def get_registration(event_id, registration_id):
 
 @app.route('/events/<int:event_id>/registrations')
 def get_event_registrations(event_id):
-    prices = None
+    completed = False
+    registrations = None
+    retval = []
+    exc_type = None
+    exc_value = None
+    exc_traceback = None
     try:
-        registrations = Registration.query.filter(Registration.event_id == event_id).all()
+        completed = False if request.args.get('completed', 'false') == 'false' else True
+        
+        if completed:
+            registrations = Registration.query.filter(Registration.event_id == event_id).all()
+        else:
+            registrations = Registration.query.filter(Registration.completed == True).all()
+  
+        for registration in registrations:        
+            participants = Participant.query.filter(Participant.event_id == event_id and Participant.registration_id == registration.id).all()
+
+            reg = {'id':registration.id, 'event_id':registration.event_id, 'completed':registration.completed}
+
+            reg['participants'] = [ {'id':participant.id,
+                'first_name':participant.first_name, 
+                'last_name':participant.last_name,
+                'email':participant.email,
+                'phone':participant.phone,
+                'age':participant.age,
+                'den':participant.den,
+                'participant_type':participant.participant_type,
+                'allergies':participant.allergies,
+                'dietary_restrictions':participant.dietary_restrictions, 
+                'event_id':participant.event_id} for participant in participants ]
+
+            retval.append(reg)
     except:
         exc_type, exc_value, exc_traceback = sys.exc_info()
+
+    if exc_type != None:
         f = io.StringIO()
         traceback.print_tb(exc_traceback, file=f)
         if exc_value is None:
             return "Unexpected error: {err}\nTraceback: {tb}".format(err=exc_type,tb=f.getvalue()), 500
         return "Unexpected error: {err}\nMessage: {msg}\nTraceback: {tb}".format(err=exc_type,msg=exc_value,tb=f.getvalue()), 500
-    if prices is None:
-        return '', 204
 
-    retval = [ {'id':registration.id, 'event_id':registration.event_id, 'completed':registration.completed} for registration in registrations ]
+    if registrations is None:
+        return '', 204
 
     return json.dumps(retval), 200, {'Content-Type': 'application/json'}
 
