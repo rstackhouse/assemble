@@ -451,7 +451,7 @@
 				notifyUrl: notifyUrl,
 				iconUrl: iconUrl,
 				returnUrl: returnUrl,
-				custom: encodeURIComponent(JSON.stringify({ registration_id: registrationId, test: test }))
+				custom: encodeURIComponent(JSON.stringify({ event_id: eventId, registration_id: registrationId, test: test }))
 			});
 
 			$('#checkout').html(checkoutHtml);
