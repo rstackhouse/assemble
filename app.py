@@ -16,6 +16,7 @@ import urllib.parse
 import smtplib, ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from decimal import *
 
 
 app = Flask(__name__, static_folder='static', static_url_path='')
@@ -38,7 +39,7 @@ class Event(db.Model):
 
 class EventPrice(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    price = db.Column(db.Float, nullable=False)
+    price = db.Column(db.DECIMAL(precision=5, scale=2), nullable=False)
     participant_type = db.Column(db.String(25), nullable=False)
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
 
@@ -79,13 +80,13 @@ class Settings(db.Model):
     test_contact_email = db.Column(db.String(100), nullable=False)
     organization_name = db.Column(db.String(100), nullable=False)
     organization_url = db.Column(db.String(100), nullable=False)
-    paypal_rate = db.Column(db.Float)
-    paypal_surcharge = db.Column(db.Float)
+    paypal_rate = db.Column(db.DECIMAL(precision=4, scale=3), nullable=False)
+    paypal_surcharge = db.Column(db.DECIMAL(precision=4, scale=2))
 
 class OrderItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    amount = db.Column(db.Float, nullable=False)
+    amount = db.Column(db.DECIMAL(scale=5, precision=2), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
     registration_id = db.Column(db.String(36), db.ForeignKey('registration.id'), nullable=False)
@@ -515,7 +516,7 @@ def process_event_registration_ipn(event_id, registration_id, charset, raw, form
     settings = None
     test = False
     order_items = []
-    total = 0.00
+    total = Decimal(value='0.00')
     msg = None
 
     try:
@@ -559,7 +560,7 @@ def process_event_registration_ipn(event_id, registration_id, charset, raw, form
 
                 temp_list = form_data.get('mc_gross_' + num)
                 if len(temp_list) > 0:
-                    item.amount = float(temp_list[0])
+                    item.amount = Decimal(value=temp_list[0])
 
                 temp_list = form_data.get('quantity' + num)
                 if len(temp_list) > 0:
