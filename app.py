@@ -102,10 +102,12 @@ def view(view_name):
 
 @app.route('/view/js/<string:view_name>')
 def js(view_name):
+    app.logger.info("Requesting: {static_folder}/js/{view_name}".format(static_folder=app.static_folder,view_name=view_name))
     return send_from_directory(app.static_folder + '/js', view_name)
 
 @app.route('/view/css/<string:view_name>')
 def css(view_name):
+    app.logger.info("Requesting: {static_folder}/css/{view_name}".format(static_folder=app.static_folder,view_name=view_name))
     return send_from_directory(app.static_folder + '/css', view_name)
 
 
