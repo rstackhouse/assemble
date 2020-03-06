@@ -8,7 +8,7 @@ import os
 import sys
 import traceback
 import io
-import json
+import simplejson as json
 import uuid
 import logging
 import requests
