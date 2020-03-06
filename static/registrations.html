@@ -1,0 +1,50 @@
+	<h2 id="loading">Loading &hellip;</h2>
+
+	<select id="events"></select>
+
+	<table class="table" id="registrations"></table>
+
+	<script type="text/plain" id="eventsTemplate">
+		{{#events}}
+			<option value="{{id}}">{{name}}</option>
+		{{/events}}
+	</script>
+
+	<script type="text/plain" id="registrationSummaryTemplate">
+		<thead class="thead-dark">
+			<th>First Name</th>
+			<th>Last Name</th>
+			<th>Participant Type</th>
+			<th>Age</th>
+			<th>Den</th>
+			<th>Email</th>
+			<th>Phone</th>
+		</thead>
+		<tbody>
+			{{#registrations}}
+				<tr class="table-dark"><td colspan=4></td></tr>
+				{{#participants}}
+					<tr>
+						<td>{{firstName}}</td>
+						<td>{{lastName}}</td>
+						<td>{{participantType}}</td>
+						{{#isAdult}}
+							<td></td>
+							<td></td>
+							<td><a href="mailto:{{{email}}}">{{email}}</a></td>
+							<td>{{phone}}</td>
+						{{/isAdult}}
+						{{^isAdult}}
+							{{#isScout}}
+								<td>{{age}}</td>
+								<td colspan="3">{{den}}</td>
+							{{/isScout}}
+							{{^isScout}}
+								<td colspan="4">{{age}}</td>
+							{{/isScout}}
+						{{/isAdult}}
+					</tr>	
+				{{/participants}}
+			{{/registrations}}
+		</tbody>
+	</script>

@@ -425,7 +425,7 @@
 		}
 		if (scouts.length > 0 || siblings.length > 0 || adults.length > 0) {
 			items.push({ 
-				name:'Processing fee',
+				name:'PayPal processing fee',
 				amount: 0.30.toFixed(2),
 				quantity: 1,
 				itemNumber: ++i
@@ -608,7 +608,7 @@
 
 	function loadView(e) {
 		$ = jQuery;
-		if ($('#event').length > 0) {
+		if ($ && $('#event').length > 0) {
 			/* Pre-loaded view */
 			handleViewLoaded();
 		}
