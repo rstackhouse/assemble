@@ -711,6 +711,83 @@ def handle_base_ipn():
 
     return msg, 200 if success else 500 if internal_error else 400
 
+@app.route('/events/<int:event_id>/registrations/<string:registration_id>/complete', methods=['POST'])
+def handle_event_registration_completion(event_id, registration_id):
+    try:
+        registration = Registration.query.filter(and_(Registration.id == registration_id, Registration.event_id == event_id)).first()
+
+        if registration.completed:
+            return '', 200
+
+        total = Decimal(value='0.00')
+        json = request.get_json()
+        payment_type = json['payment_type']
+        test = json.get('test', False)
+        settings = Settings.query.get(1)
+        event = Event.query.filter(Event.id == event_id).first()
+        prices = EventPrice.query.filter(EventPrice.event_id == event_id).all()
+        participants = Participant.query.filter(Participant.registration_id == registration_id).all()
+
+        d = {}
+
+        order_items = []
+
+        for participant in participants:
+            l = d.get(participant.participant_type, [])
+            l.append(participant)
+            d[participant.participant_type] = l
+
+        for key in d:
+            l = d.get(key)
+            price = None
+            for event_price in prices:
+                if event_price.participant_type == l[0].participant_type:
+                    price = event_price
+                    break
+            item = OrderItem()
+            
+            if payment_type == 'PayPal':
+                item.amount = (price.price * len(l)) / (Decimal(value='1.00') - settings.paypal_rate)
+            else:
+                item.amount = price.price * len(l)
+            item.quantity = 1
+            item.name = "{participant_type} {event_name} registration".format(participant_type=l[0].participant_type, event_name=event.name)
+            item.event_id = event_id
+            item.registration_id = registration_id
+            db.session.add(item)
+            order_items.append(item)
+
+            total = total + item.amount
+
+        if payment_type == 'PayPal':
+            item.amount = settings.paypal_surcharge
+            item.quantity = 1
+            item.name = 'PayPal processing fee'
+            item.event_id = event_id
+            item.registration_id = registration_id
+            db.session.add(item)
+            order_items.append(item)
+
+            total = total + item.amount
+
+        registration.completed = True
+
+        db.session.commit()
+
+        send_participant_emails(settings, event_id, registration_id, order_items, total, test=test)
+    except:
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        f = io.StringIO()
+        traceback.print_tb(exc_traceback, file=f)
+        msg = None
+        if exc_value is None:
+            msg = "Unexpected error: {err}\nTraceback: {tb}".format(err=exc_type,tb=f.getvalue())
+        else:
+            msg = "Unexpected error: {err}\nMessage: {msg}\nTraceback: {tb}".format(err=exc_type,msg=exc_value,tb=f.getvalue())
+        app.logger.error(msg)
+        return  msg, 500
+    return '', 202
+
 @app.route('/settings')
 def get_settings():
     settings = None

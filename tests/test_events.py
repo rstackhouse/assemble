@@ -32,7 +32,7 @@ class EventTests(unittest.TestCase):
         settings.verification_url = 'http://not-a-real-verification-url'
         settings.test_verification_url = 'http://test-not-a-real-verification-url'
         settings.smtp_host = 'somewhere-org'
-        settings.smtp_port = 587
+        settings.smtp_port = 465
         settings.smtp_login = 'some.guy@somewhere-org'
         settings.smtp_pass = 'apassword'
         settings.notification_email = 'someone.who.cares@somewhere-org'
@@ -165,6 +165,17 @@ class EventTests(unittest.TestCase):
         )
         return response
 
+    def send_registration_complete(self, event_id, registration_id, payment_type, test=False):
+        data = {
+            'payment_type': payment_type,
+            'test': test
+        }
+        response = self.app.post(
+            "/events/{event_id}/registrations/{registration_id}/complete".format(event_id=event_id,registration_id=registration_id), 
+            json=data
+        )
+        return response
+
     def test_should_render_main_page(self):
         response = self.app.get('/')
         self.assertEqual(response.status_code, 200)
@@ -247,6 +258,22 @@ class EventTests(unittest.TestCase):
         registration = Registration.query.filter(Registration.id == registration_id).first()
         self.assertTrue(registration.completed)
 
+    @patch('app.smtplib')
+    @patch('app.ssl')
+    def test_should_manually_complete_registration(self, mock_ssl, mock_smtplib):
+        self.create_event('an event', datetime.datetime.now().strftime('%Y-%d-%m %H:%M'), 'an event')
+        self.create_event_price(1, 'Adult', 10.00)
+        self.create_event_price(1, 'Scout', 10.00)
+        self.create_event_price(1, 'Sibling', 10.00)
+        self.create_registration(1)
+        registration_id = Registration.query.filter(Registration.event_id == 1).first().id 
+        self.create_participant(1, registration_id, 'John', 'Smith', 'Adult')
+        self.create_participant(1, registration_id, 'Jimbo', 'Smith', 'Scout')
+        self.create_participant(1, registration_id, 'James', 'Smith', 'Sibling')
+        participants = Participant.query.filter(Participant.registration_id == registration_id).all()
+        self.send_registration_complete(1, registration_id, 'PayPal')
+        registration = Registration.query.filter(Registration.id == registration_id).first()
+        self.assertTrue(registration.completed)
 
 if __name__ == '__main__':
     unittest.main()
