@@ -259,6 +259,19 @@
 		}
 	}
 
+	function canLoadView() {
+		return loading.length == 0;	
+	}
+
+	function markLoaded(e) {
+		for (var i = 0; i < loading.length; i++) {
+			if (e === loading[i]) {
+				loading.splice(i, 1);	
+				return;
+			}
+		}
+	}
+
 	function render() {
 		var eventsHtml = null;
 		var registrationsHtml = null;
