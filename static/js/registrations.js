@@ -287,12 +287,12 @@
 		var registrationsHtml = null;
 
 		if (events) {
-			eventsHtml = Mustache.render(eventsTemplate, events);
+			eventsHtml = Mustache.render(eventsTemplate, {events: events});
 			$('#events').html(eventsHtml);
 		}
 
 		if (registrations) {
-			registrationsHtml = Mustache.render(registrationsSummaryTemplate, registrations);
+			registrationsHtml = Mustache.render(registrationsSummaryTemplate, {registrations: registrations});
 			$('#registrations').html(registrationsHtml);
 		}
 		$('#loading').hide();
