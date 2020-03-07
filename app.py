@@ -426,9 +426,9 @@ def get_event_registrations(event_id):
         completed = False if request.args.get('completed', 'false') == 'false' else True
         
         if completed:
-            registrations = Registration.query.filter(Registration.event_id == event_id).all()
+            registrations = Registration.query.filter(and_(Registration.event_id == event_id, Registration.completed == True)).all()
         else:
-            registrations = Registration.query.filter(Registration.completed == True).all()
+            registrations = Registration.query.filter(Registration.event_id == event_id).all()
   
         for registration in registrations:        
             participants = Participant.query.filter(and_(Participant.event_id == event_id, Participant.registration_id == registration.id)).all()
