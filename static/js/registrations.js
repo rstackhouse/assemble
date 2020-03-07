@@ -3,6 +3,7 @@
 	var loading = [];
 	var script = document.currentScript;
 	var scriptPath = script.src;
+	var basePath = scriptPath.substr(0,script.src.indexOf('/view'));
 	var cssBaseFileName = scriptPath.substr(scriptPath.lastIndexOf('/') + 1).replace('.js', '');
 	var viewSrc = null;
 	var documentLoaded = false;
