@@ -6,6 +6,7 @@
 	var basePath = scriptPath.substr(0,script.src.indexOf('/view'));
 	var cssBaseFileName = scriptPath.substr(scriptPath.lastIndexOf('/') + 1).replace('.js', '');
 	var viewSrc = null;
+	var viewLoading = false;
 	var documentLoaded = false;
 	var eventsTemplate = null;
 	var registrationsSummaryTemplate = null;
