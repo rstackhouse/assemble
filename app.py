@@ -389,6 +389,31 @@ def get_registration(event_id, registration_id):
 
     return json.dumps(retval), 200, {'Content-Type': 'application/json'}
 
+@app.route('/events')
+def get_events():
+    events = []
+
+    try:
+        events = Event.query.all()
+    except:
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        f = io.StringIO()
+        traceback.print_tb(exc_traceback, file=f)
+        msg = None
+        if exc_value is None:
+            msg = "Unexpected error: {err}\nTraceback: {tb}".format(err=exc_type,tb=f.getvalue()), 500
+        else:
+            msg = "Unexpected error: {err}\nMessage: {msg}\nTraceback: {tb}".format(err=exc_type,msg=exc_value,tb=f.getvalue())
+        app.logger.error(msg)
+        return  msg, 500
+
+    retval = [ { 'id': event.id,
+        'name': event.name,
+        'date': event.date.strftime('%Y-%m-%d %H:%M:%S'),
+        'description': event.description } for event in events ]
+
+    return json.dumps(retval), 200, {'Content-Type': 'application/json'}
+
 @app.route('/events/<int:event_id>/registrations')
 def get_event_registrations(event_id):
     completed = False

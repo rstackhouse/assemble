@@ -71,6 +71,10 @@ class EventTests(unittest.TestCase):
         response = self.app.post('/events/prices', json=data)
         return response
 
+    def get_events(self):
+        response = self.app.get('/events')
+        return response
+
     def create_registration(self, event_id):
         response = self.app.post("/events/{event_id}/registrations/create".format(event_id=event_id))
         return response
@@ -183,6 +187,14 @@ class EventTests(unittest.TestCase):
     def test_should_create_event(self):
         response = self.create_event('an event', datetime.datetime.now().strftime('%Y-%d-%m %H:%M'), 'an event')
         self.assertEqual(response.status_code, 201)
+
+    def test_should_get_events(self):
+        self.create_event('an event', datetime.datetime.now().strftime('%Y-%d-%m %H:%M'), 'an event')
+        self.create_event('another event', datetime.datetime.now().strftime('%Y-%d-%m %H:%M'), 'another event')
+        self.create_event('yet another event', datetime.datetime.now().strftime('%Y-%d-%m %H:%M'), 'yet another event')
+        response = self.get_events()
+        events = response.get_json()
+        self.assertEqual(len(events), 3)
 
     def test_should_create_event_price(self):
         self.create_event('an event', datetime.datetime.now().strftime('%Y-%d-%m %H:%M'), 'an event')
