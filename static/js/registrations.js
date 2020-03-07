@@ -292,7 +292,8 @@
 		}
 
 		if (registrations) {
-			registrationsHtml = Mustache.render(registrationsSummaryTemplate, {registrations: registrations});
+			var list = $.grep(registrations, function(a, i) { return a.participants.length > 0 });
+			registrationsHtml = Mustache.render(registrationsSummaryTemplate, {registrations: list});
 			$('#registrations').html(registrationsHtml);
 		}
 		$('#loading').hide();
