@@ -223,8 +223,8 @@
 						phone: p.phone,
 						age: p.age,
 						den: p.den,
-						isAdult: p.participant_type == 'Adult',
-						isScout: p.participant_type == 'Scout'
+						isAdult: p.participant_type.toLowerCase() == 'adult',
+						isScout: p.participant_type.toLowerCase() == 'scout'
 					};
 					registration.participants.push(participant);
 				}
